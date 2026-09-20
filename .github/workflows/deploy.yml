@@ -101,6 +101,10 @@ jobs:
         run: |
           npm install -g purgecss
           purgecss -c purgecss.config.js
+      - name: Disable GitHub's Jekyll rebuild 🚫
+        # Without this, GitHub Pages runs its own legacy Jekyll build over the
+        # gh-pages branch and drops directories like _pages/ from the output.
+        run: touch _site/.nojekyll
       - name: Deploy 🚀
         if: github.event_name != 'pull_request'
         uses: JamesIves/github-pages-deploy-action@v4

@@ -1,14 +1,18 @@
+# DISABLED 2026-09-21 until the CV page is built (PLAN.md M2-S2.7).
+# The shipped demo _data/cv.yml fails current rendercv schema validation, and
+# this workflow ends by pushing an auto-commit to main. Automatic triggers are
+# off; re-enable the `push:` block below once _data/cv.yml holds real data.
 name: Render a CV
 on:
-  push:
-    branches:
-      - main
-      - master
-    paths:
-      - "_data/cv.yml"
-      - "assets/rendercv/design.yaml"
-      - "assets/rendercv/locale.yaml"
-      - "assets/rendercv/settings.yaml"
+  # push:
+  #   branches:
+  #     - main
+  #     - master
+  #   paths:
+  #     - "_data/cv.yml"
+  #     - "assets/rendercv/design.yaml"
+  #     - "assets/rendercv/locale.yaml"
+  #     - "assets/rendercv/settings.yaml"
   workflow_call:
   workflow_dispatch:
 permissions:

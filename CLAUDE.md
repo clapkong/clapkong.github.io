@@ -12,8 +12,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 bundle install                                # ruby gems
-bundle exec jekyll serve                      # dev server → http://localhost:4000/al-folio/  (NOTE baseurl)
-bundle exec jekyll build --baseurl /al-folio  # production-style build to _site/
+bundle exec jekyll serve                      # dev server → http://localhost:4000/  (baseurl is blank; user site)
+bundle exec jekyll build                      # production-style build to _site/ — never pass --baseurl
 bash test/integration_distill.sh              # run ONE integration test (any of the seven in test/)
 npm run test:visual:update                    # refresh playwright snapshots after intentional UI change
 bundle exec al-folio upgrade apply --safe     # deterministic codemods (font-weight-* → font-*, remote→local URLs)
@@ -29,16 +29,15 @@ bundle exec al-folio upgrade overrides diff <path>    # then `overrides accept <
 
 ## Docker serving model (v1-specific)
 
-`docker compose up -d` bind-mounts the repo to `/srv/jekyll` and runs `bin/entry_point.sh`, which serves with `--force_polling --destination /tmp/_site`. The build output deliberately goes to **container-local `/tmp/_site`, not the bind-mounted `_site`** — writing `_site` back across the host bind mount caused write deadlocks. The container also `inotifywait`s `_config.yml` and restarts Jekyll on change (config edits aren't hot-reloaded by `--watch`). Verify with the `/al-folio` baseurl: `curl -fsS http://127.0.0.1:8080/al-folio/`. `docker-compose-slim.yml` pulls a prebuilt `:slim` image instead of building locally.
+`docker compose up -d` bind-mounts the repo to `/srv/jekyll` and runs `bin/entry_point.sh`, which serves with `--force_polling --destination /tmp/_site`. The build output deliberately goes to **container-local `/tmp/_site`, not the bind-mounted `_site`** — writing `_site` back across the host bind mount caused write deadlocks. The container also `inotifywait`s `_config.yml` and restarts Jekyll on change (config edits aren't hot-reloaded by `--watch`). Verify at the domain root (baseurl is blank): `curl -fsS http://127.0.0.1:8080/`. `docker-compose-slim.yml` pulls a prebuilt `:slim` image instead of building locally.
 
-## CI gates and the style contract
+## CI gates
 
-`npm run lint:style-contract` (`test/style_contract.js`) is the automated enforcement of the thin-starter boundary and will fail CI if you cross it. Beyond the forbidden paths listed in `AGENTS.md`, it also asserts that `_config.yml` keeps `theme: al_folio_core` and the required plugins, that the `third_party_libraries` SRI pins are present, and that the `al_math` Gemfile pin stays on a released version rather than a git branch.
+The style contract is gone — `test/style_contract.js`, its npm script and its `unit-tests.yml` step were deleted on 2026-09-21. `AGENTS.md` § Stop sign says what that check used to cover and what is now unverified.
 
-Other gates:
+Remaining gates:
 
-- `unit-tests.yml` — style contract plus all seven `test/integration_*.sh` scripts (`comments`, `plugin_toggles`, `distill`, `bootstrap_compat`, `upgrade_cli`, `css_minify`, `new_plugins`).
-- `visual-regression.yml` — Playwright on chromium + webkit, diffing the candidate build against a `v0.16.3` baseline worktree served on `:4100` via `BASELINE_URL`.
+- `unit-tests.yml` — all seven `test/integration_*.sh` scripts (`comments`, `plugin_toggles`, `distill`, `bootstrap_compat`, `upgrade_cli`, `css_minify`, `new_plugins`).
 - `upgrade-check.yml` — `bundle exec al-folio upgrade audit`.
 - `prettier.yml` — Prettier with `@shopify/prettier-plugin-liquid` and `printWidth: 150`. Run `npm run lint:prettier` before pushing; `npx prettier . --write` fixes.
 - `update-tocs.yml` — regenerates `<!--ts-->…<!--te-->` blocks in changed root and `docs/` Markdown files. If you add or rename a heading, expect a follow-up auto-commit on `main`.
@@ -46,3 +45,33 @@ Other gates:
 ## Gem version pins
 
 `Gemfile` pins every `al-*` gem to an exact released version in `group :al_folio_plugins`, and `_config.yml` lists the same gems under `plugins:`. Read the current pins from the `Gemfile` rather than trusting any version quoted in prose — including here. To test a gem fix against this site, repoint the `Gemfile` at a sibling checkout (`path:`, `git:`, or `branch:`) and `bundle install`; see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md#working-on-a-gem-alongside-the-starter). Revert the pin before committing.
+
+## Session log — `.claude/BUILD_LOG.md`
+
+Ported from the `previous` repo. The log is gitignored, so it is a local record, not repo history — `git log` is the shared one. It exists to answer "what did the last session actually do, and why" without re-reading a diff.
+
+**Write an entry when a stage in [`.claude/PLAN.md`](.claude/PLAN.md) reaches a real end state** — done, or abandoned with a reason. Not for clarifying questions, reads, or a half-finished edit that the next message will change.
+
+**Append to the end of the file. Never insert.** New entries go after the file's last `---`, so the file always reads oldest at top, newest at bottom. Inserting at the `<!-- ENTRIES_START -->` marker reverses that order, which is how the log in `previous` got scrambled.
+
+Entry format:
+
+```markdown
+## [YYYY-MM-DD HH:MM KST] M0-S0.5 — 배포 복구
+
+**Status**: ✅ completed <!-- or ⚠️ partial / ❌ abandoned -->
+**Files**:
+
+- modified: .github/workflows/deploy.yml
+- deleted: .github/workflows/lighthouse-badger.yml
+  **Summary**: 한두 문장. 무엇을 왜 했는지. 파일명 나열보다 동작·판단 근거를 적는다.
+```
+
+Rules for the fields:
+
+- **Stage id** matches `PLAN.md` (`M0-S0.5`, `M2-S2.3`). No stage → omit the id and keep the title.
+- **Status** is honest. A stage blocked on a decision is `⚠️ partial` with the blocker named in the summary; do not mark it completed.
+- **Files** lists `created:` / `modified:` / `deleted:`. Skip generated output (`_site/`, `Gemfile.lock` from a plain `bundle install`).
+- **Summary** records what a diff cannot: why this approach, what was rejected, what is now unverified, what surprised us. Verification results (build time, test outcome) belong here.
+
+Separate each entry from the previous one with `---`.

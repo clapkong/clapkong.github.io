@@ -19,3 +19,7 @@ vendor
 # Python bytecode from bin/ helper scripts
 __pycache__/
 *.pyc
+
+# 내가 추가한 Claude 작업 문서 — 로컬 전용 (.claude/skills 심볼릭 링크는 al-folio 것이라 유지)
+.claude/*
+!.claude/skills

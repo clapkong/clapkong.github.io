@@ -23,17 +23,19 @@ Find your change on the left; edit only what is on the right.
 
 [`docs/BOUNDARIES.md`](docs/BOUNDARIES.md) is the authoritative area-to-gem table. [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) explains how the pieces connect.
 
-## Stop sign
+## Stop sign — lifted in this repo
 
-**If your change would create any of these paths in this repo, it belongs in a gem instead:**
+> **This is clapkong.github.io, a site built _from_ the al-folio template, not the `alshedivat/al-folio` starter.** The stop sign below is upstream's rule and does **not** bind us. Shadowing a gem-owned file is the officially supported way to customize a user site.
+
+Upstream forbids these paths, because in the starter repo that runtime belongs to the gems:
 
 ```
 _layouts/   _includes/   _sass/   _scripts/   assets/tailwind/   tailwind.config.js   assets/webfonts/
 ```
 
-`npm run lint:style-contract` fails CI when any of them exists here, and it also rejects `build:css` / `build:tailwind` npm scripts. Do not add a starter-local Tailwind or CSS build pipeline.
+Here they are expected: the re-skin planned in `.claude/PLAN.md` M1–M2 creates several deliberately. See [local overrides: your site vs. this repo](docs/ARCHITECTURE.md#local-overrides-your-site-vs-this-repo).
 
-This restriction applies to **this repo only**. A user's own site created from this template _may_ legally shadow gem-owned files — see [local overrides: your site vs. this repo](docs/ARCHITECTURE.md#local-overrides-your-site-vs-this-repo).
+`test/style_contract.js` enforced that boundary and **was deleted on 2026-09-21** (PLAN.md M0-S0.3), along with its `npm run lint:style-contract` script and its `unit-tests.yml` step. It would have failed on every legal override. Deleting it also gave up its other assertions — that `_config.yml` keeps `theme: al_folio_core` and the required plugins, that `third_party_libraries` SRI pins exist, and that `al_math` is pinned to a released version. **Nothing checks those now**, so when you edit the `Gemfile` or `_config.yml` plugin list, verify by hand that the two lists still agree (see failure mode 2 below).
 
 ## Three failures that produce no error message
 
@@ -41,7 +43,9 @@ Read [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md#failure-modes-that-produce-no
 
 1. **Features fail silently.** A feature renders only when its gem is loaded _and_ its flag is on _and_ the page opts in. Otherwise the Liquid tag emits an empty string — no warning, no error.
 2. **`Gemfile` and `_config.yml` are two lists that must agree.** A plugin in only one of them is inert. Adding or removing a plugin means editing both. Repo dirs use hyphens (`al-folio-core`); gem/plugin ids use underscores (`al_folio_core`).
-3. **This repo's effective baseurl is `/al-folio`.** `_config.yml` already sets it, so a plain `bundle exec jekyll build` is correct — that is what `deploy.yml`, `broken-links-site.yml` and `axe.yml` run. Passing `--baseurl /al-folio` is redundant but harmless; blanking the baseurl out is what renders the site unstyled with broken links. Dev server is at `http://localhost:4000/al-folio/`.
+3. **This repo's baseurl is blank, and must stay blank.** `clapkong.github.io` is a GitHub _user site_: it is served from the domain root, so `_config.yml` keeps the `baseurl:` key with **no value**. Deleting the key or giving it a value are both wrong — a value prefixes every asset URL and renders the site unstyled with broken links. The blog lives at `/blog/` because `_pages/blog.md` sets `permalink: /blog/`, not because of baseurl. A plain `bundle exec jekyll build` is correct; never pass `--baseurl`. Dev server is at `http://localhost:4000/`.
+
+   > Upstream's version of this file said the baseurl here is `/al-folio`, which is true of the `alshedivat/al-folio` demo and was true of this repo until 2026-09-21. It is what made `https://clapkong.github.io/` serve an unstyled page.
 
 ## Validated local command set
 
@@ -51,8 +55,7 @@ Run from the repo root, in this order:
 bundle install
 npm ci
 npm run lint:prettier
-npm run lint:style-contract
-bundle exec jekyll build --baseurl /al-folio
+bundle exec jekyll build
 bash test/integration_comments.sh
 bash test/integration_plugin_toggles.sh
 bash test/integration_distill.sh
@@ -66,7 +69,7 @@ bundle exec al-folio upgrade audit
 bundle exec al-folio upgrade overrides audit
 bundle exec al-folio upgrade report
 docker compose up -d
-curl -fsS http://127.0.0.1:8080/al-folio/ >/dev/null
+curl -fsS http://127.0.0.1:8080/ >/dev/null
 docker compose logs --tail=80
 docker compose down
 ```
