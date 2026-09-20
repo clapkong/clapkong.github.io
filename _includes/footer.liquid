@@ -1,0 +1,138 @@
+{%- comment -%}
+  LOCAL OVERRIDE of al_folio_core's `_includes/footer.liquid`.
+  Rebuilt to DESIGN.md §7: logo + copyright on the left, two small labelled link
+  groups on the right, separated from the page by a hairline top border.
+
+  Upstream branches on `site.footer_fixed` to pin the footer to the viewport.
+  DESIGN.md has no fixed footer, so that branch is gone and `_config.yml` sets
+  `footer_fixed: false` to keep the two in agreement.
+
+  The right-hand links read `_data/socials.yml`, which still holds al-folio's
+  demo values (Einstein). They will come good on their own once S0.2/S0.4
+  replaces that data — nothing here needs editing for that.
+{%- endcomment -%}
+
+<footer class="site-footer" role="contentinfo">
+  {%- if site.newsletter.enabled -%}
+    {%- if site.plugins contains 'al_newsletter' -%}
+      {% include plugins/al_newsletter_form_center.liquid %}
+    {%- else -%}
+      {% include newsletter.liquid %}
+    {%- endif -%}
+  {%- endif -%}
+
+  <div class="site-footer__inner">
+    <div class="site-footer__brand">
+      <a class="site-logo" href="{{ '/' | relative_url }}">
+        <span class="site-logo__dot" aria-hidden="true"></span>
+        <span class="site-logo__name">
+          {%- if site.title == 'blank' -%}
+            {{- site.first_name }}
+            {{ site.last_name -}}
+          {%- else -%}
+            {{- site.title -}}
+          {%- endif -%}
+        </span>
+      </a>
+      {%- comment -%}
+        Upstream's credit line, kept deliberately. DESIGN.md §7 shows only
+        "© 2026 · built with jekyll", but dropping the Jekyll / al-folio /
+        GitHub Pages attribution would quietly strip credit the project is owed.
+      {%- endcomment -%}
+      <p class="site-footer__meta">
+        &copy; Copyright {{ site.time | date: '%Y' }}
+        {{ site.first_name }}
+        {{ site.middle_name }}
+        {{ site.last_name }}.
+        {{ site.footer_text }}
+        {%- if site.last_updated %} Last updated: {{ 'now' | date: '%B %d, %Y' }}.{% endif -%}
+      </p>
+    </div>
+
+    {%- comment -%}
+      DESIGN.md §7 draws two labelled text groups here ("contact" / "follow").
+      Replaced with an icon row by request.
+
+      This is an explicit list, not `{% social_links %}`, because the footer and
+      the about page want different sets: the about page shows everything in
+      `_data/socials.yml` (CV, RSS, and whatever else is configured), while the
+      footer is only "how to reach me". Values still come from socials.yml, so
+      there is one place to change an address — but adding a service there does
+      NOT add it here, which is the intent. Add a block below to include one.
+    {%- endcomment -%}
+    <nav class="site-footer__socials" aria-label="Contact">
+      {%- comment -%}
+        Four links, most-important first: email is the author's stated best way
+        to be reached, then the two profiles, then the feed.
+
+        Left out on purpose, and both still present on the about page:
+          - CV      duplicates LinkedIn, and gets its own page at M2-S2.7
+          - Scholar one paper; publications gets its own page at M2-S2.5
+        The footer repeats on every page, so a weak link gets the site's heaviest
+        repetition — which is the argument for keeping this list short.
+      {%- endcomment -%}
+
+      {%- if site.data.socials.email -%}
+        {%- comment -%}
+          Hand-built rather than `{% al_email_protect_link %}`, which renders the
+          address as text ("user [at] host") and would replace the icon. The
+          plugin's JS is delegated and only reads `data-eu` / `data-ed` off
+          `.al-email-protect`, leaving any children alone — including this icon.
+          Splitting here means the built HTML never contains the joined address,
+          which is the point: harvesters parse markup, they do not run JS.
+        {%- endcomment -%}
+        {%- assign email_parts = site.data.socials.email | split: '@' -%}
+        {%- if site.protect_email and email_parts.size == 2 -%}
+          <a
+            href="#"
+            class="al-email-protect"
+            data-eu="{{ email_parts[0] }}"
+            data-ed="{{ email_parts[1] }}"
+            title="Email (click to copy)"
+            aria-label="Copy email address"
+          >
+            <i class="fa-solid fa-envelope" aria-hidden="true"></i>
+          </a>
+        {%- else -%}
+          <a href="mailto:{{ site.data.socials.email }}" title="Email" aria-label="Email">
+            <i class="fa-solid fa-envelope" aria-hidden="true"></i>
+          </a>
+        {%- endif -%}
+      {%- endif -%}
+
+      {%- if site.data.socials.github_username -%}
+        <a
+          href="https://github.com/{{ site.data.socials.github_username }}"
+          title="GitHub"
+          aria-label="GitHub"
+          target="_blank"
+          rel="noopener"
+        >
+          <i class="fa-brands fa-github" aria-hidden="true"></i>
+        </a>
+      {%- endif -%}
+
+      {%- if site.data.socials.linkedin_username -%}
+        <a
+          href="https://www.linkedin.com/in/{{ site.data.socials.linkedin_username }}"
+          title="LinkedIn"
+          aria-label="LinkedIn"
+          target="_blank"
+          rel="noopener"
+        >
+          <i class="fa-brands fa-linkedin" aria-hidden="true"></i>
+        </a>
+      {%- endif -%}
+
+      <a href="{{ '/feed.xml' | relative_url }}" title="RSS feed" aria-label="RSS feed">
+        <i class="fa-solid fa-square-rss" aria-hidden="true"></i>
+      </a>
+    </nav>
+  </div>
+
+  {%- if site.impressum_path -%}
+    <p class="site-footer__meta site-footer__impressum">
+      <a href="{{ site.impressum_path | relative_url }}">Impressum</a>
+    </p>
+  {%- endif -%}
+</footer>

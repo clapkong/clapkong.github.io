@@ -1,0 +1,203 @@
+/*******************************************************************************
+ * Site header — DESIGN.md §5 colour and type, applied on top of al-folio's own
+ * navbar rather than replacing it.
+ *
+ * Why restyle instead of rewrite: the gem's navbar markup carries behaviour
+ * that is invisible in the HTML — progress-bar.js measures `#navbar` to place
+ * the scroll bar, `.navbar-toggler .icon-bar` is the hamburger→X morph,
+ * `.navbar` itself owns `opacity: 0.95`. A hand-written header dropped all of
+ * that with no error (see BUILD_LOG 2026-09-21 M2-S2.1). `_includes/header.liquid`
+ * is now the gem's file with one edit, and everything visual happens here.
+ *
+ * Specificity note: the gem's `_sass/_navbar.scss` reaches for
+ * `.navbar.navbar-light .navbar-nav .nav-item .nav-link`. These rules match it
+ * selector-for-selector so load order decides, and main.scss loads this last.
+ ******************************************************************************/
+
+.navbar {
+  /* DESIGN.md §5 asks for a 0.5px hairline; the gem draws 1px. */
+  border-bottom: 0.5px solid var(--color-border);
+  /* `opacity: 0.95` stays as the gem sets it — that translucency is the header. */
+}
+
+/* -----------------------------------------------------------------------------
+ * Brand — accent dot + name (DESIGN.md §5). The dot class is shared with the
+ * footer, which defines it in `_site-footer.scss`.
+ * -------------------------------------------------------------------------- */
+
+.navbar .navbar-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.navbar.navbar-light .navbar-brand {
+  color: var(--color-text);
+
+  &:hover {
+    color: var(--color-text);
+  }
+}
+
+.navbar .site-logo__name {
+  font-family: var(--font-serif);
+  /* `.site-logo__name` is shared with the footer, which pins it to 13px per
+     DESIGN.md §7; the header needs its own size, not the inherited one.
+     16px is the midpoint between that 13px and al-folio's 20px `.navbar-brand`. */
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* -----------------------------------------------------------------------------
+ * Nav items — 13px, the midpoint between DESIGN.md's 12px and al-folio's
+ * inherited 14px. Colour, case and the active underline are DESIGN.md's.
+ * -------------------------------------------------------------------------- */
+
+.navbar.navbar-light .navbar-nav .nav-item .nav-link {
+  position: relative;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  text-transform: lowercase;
+  color: var(--color-meta);
+  transition: color 0.2s ease-in-out;
+
+  &:hover {
+    color: var(--color-text);
+  }
+}
+
+/* Active is colour plus a 1.5px accent underline — never bold. The gem uses
+   `font-weight: bolder`, which is outside the 400/500 system (DESIGN.md §3).
+ *
+ * Drawn as `::after` rather than `border-bottom`. A border spans the element's
+ * padding box, and al-folio pads `.nav-link` by 0.5rem on each side, so the rule
+ * ran 16px wider than the word and sat at the bottom of that padding. Insetting
+ * a pseudo-element by the same padding matches the text exactly and lets the
+ * line sit close under it, the way `previous` drew it.
+ *
+ * No reserved copy on the inactive state is needed: the pseudo-element is taken
+ * out of flow, so it cannot shift the row. */
+.navbar.navbar-light .navbar-nav .nav-item.active > .nav-link {
+  font-weight: var(--weight-medium);
+  color: var(--color-text);
+
+  &:hover {
+    color: var(--color-text);
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    /* Below 576px the gem drops the horizontal padding (`.nav-link { padding:
+       .5rem 0 }`), so the inset follows it in the media query below. */
+    left: 0;
+    right: 0;
+    bottom: 7px;
+    height: 1.5px;
+    background: var(--color-accent);
+  }
+}
+
+@media (min-width: 576px) {
+  /* `.navbar-expand-sm .navbar-nav .nav-link { padding: .5rem }` kicks in here. */
+  .navbar.navbar-light .navbar-nav .nav-item.active > .nav-link::after {
+    left: 0.5rem;
+    right: 0.5rem;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+ * Scroll progress bar
+ *
+ * al-folio draws a 1px accent line with no track. `previous` used 2px over a
+ * `--color-divider-soft` track, which reads as a deliberate element rather than
+ * a hairline artefact. `progress-bar.js` positions it at the navbar's height;
+ * only its thickness and colours are set here.
+ *
+ * Three selectors for one bar: the element itself (Firefox track + layout), and
+ * the two vendor pseudo-elements WebKit splits it into. `.progress-container` /
+ * `.progress-bar` are the non-`<progress>` fallback in the same markup.
+ * -------------------------------------------------------------------------- */
+
+progress {
+  height: 2px;
+  background-color: var(--color-divider-soft);
+
+  &::-webkit-progress-bar {
+    background-color: var(--color-divider-soft);
+  }
+
+  &::-webkit-progress-value {
+    background-color: var(--color-accent);
+  }
+
+  &::-moz-progress-bar {
+    background-color: var(--color-accent);
+  }
+}
+
+.progress-container {
+  height: 2px;
+  background-color: var(--color-divider-soft);
+}
+
+.progress-bar {
+  background-color: var(--color-accent);
+}
+
+/* The search trigger sits in the same row and should read as meta, not as a
+   link. al_search rewrites its inner `.nav-link` to `⌘ k` on macOS. */
+#search-toggle {
+  color: var(--color-meta);
+
+  &:hover {
+    color: var(--color-text);
+  }
+
+  .nav-link {
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+ * Dropdown — DESIGN.md §6: thin border, no shadow. The gem's Tailwind layer
+ * gives it a shadow and a 1px border.
+ * -------------------------------------------------------------------------- */
+
+.navbar .dropdown-menu {
+  border: 0.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  box-shadow: none;
+  padding: 6px;
+}
+
+.navbar .dropdown-menu .dropdown-item {
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  color: var(--color-text);
+
+  &:hover {
+    background-color: var(--color-soft-bg);
+    color: var(--color-text);
+  }
+}
+
+/* Upstream fills the active row with the theme colour, which at this palette is
+   a solid pink slab. DESIGN.md keeps filled pink for badges, not menu rows. */
+.navbar .dropdown-menu .dropdown-item.active,
+.navbar .dropdown-menu .dropdown-item:active {
+  background-color: var(--color-soft-bg);
+  color: var(--color-accent) !important;
+  font-weight: var(--weight-medium);
+}
+
+/* -----------------------------------------------------------------------------
+ * Hamburger — keep the gem's morph, restate only the colour and weight.
+ * -------------------------------------------------------------------------- */
+
+.navbar-toggler .icon-bar {
+  background-color: var(--color-text);
+  height: 1.5px;
+}

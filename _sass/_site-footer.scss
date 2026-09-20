@@ -1,0 +1,143 @@
+/*******************************************************************************
+ * Site footer — DESIGN.md §7.
+ *
+ * Own class names, so the gem's `_sass/_footer.scss` (`footer.fixed-bottom`,
+ * `footer.sticky-bottom`) does not apply. `_config.yml` sets
+ * `footer_fixed: false` to match; there is no fixed-footer variant here.
+ ******************************************************************************/
+
+.site-footer {
+  margin-top: 64px;
+  border-top: 0.5px solid var(--color-border);
+  background: var(--color-base);
+}
+
+.site-footer__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  max-width: var(--page-max-width);
+  margin-inline: auto;
+  /* 20px, down from DESIGN.md §7's 24px: the credit block is two lines and the
+     icon row one, so the original padding left the bar looking top-heavy. */
+  padding: 20px var(--page-gutter);
+}
+
+.site-footer__meta {
+  /* Holds the full upstream credit line, so it needs room to wrap rather than
+     the single short line DESIGN.md §7 draws. */
+  max-width: 560px;
+  margin: 8px 0 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.7;
+  color: var(--color-meta);
+
+  a {
+    color: var(--color-meta);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+
+    &:hover {
+      color: var(--color-accent);
+    }
+  }
+}
+
+.site-footer__socials {
+  display: flex;
+  align-items: center;
+  /* Tighter than the header's 22px: these are icons, not words, so they read as
+     one group at a smaller interval and stay clear of the credit block. */
+  gap: 14px;
+  /* The credit block on the left runs two lines; a single row of small icons
+     beside it read as an afterthought. Larger icons and a centred alignment
+     give the two sides comparable weight. */
+  align-self: center;
+
+  a {
+    display: inline-flex;
+    /* jekyll-socials emits bare <a><i></i></a>, so the link itself carries no
+       size; this is what actually sets the icon scale. */
+    font-size: 20px;
+    line-height: 1;
+    color: var(--color-meta);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--color-accent);
+      text-decoration: none;
+    }
+  }
+
+  /* `custom_social` entries render an <img>, not an icon font. */
+  img,
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.site-footer__impressum {
+  max-width: var(--page-max-width);
+  margin-inline: auto;
+  padding: 0 var(--page-gutter) 20px;
+}
+
+/* al-folio's `#back-to-top` is `position: fixed` in the bottom-right corner, so
+   at the bottom of the page it floats over whatever sits there. Upstream's
+   footer was centred text, which left that corner empty; ours puts the icon row
+   exactly under the button.
+
+   The container is centred at 1200px, so above ~1344px the page's own slack
+   already clears the button. Below that the container is full-bleed and the two
+   collide (measured: 42px of overlap at 900-1100px, covering the last icons and
+   blocking their clicks). Reserve the button's footprint across that range only;
+   under 768px the footer stacks and the icons move left, clearing it again. */
+@media (min-width: 769px) and (max-width: 1343px) {
+  .site-footer__socials {
+    padding-right: 56px;
+  }
+}
+
+@media (max-width: 768px) {
+  .site-footer__inner {
+    flex-direction: column;
+    gap: 24px;
+    padding-inline: 20px;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+ * Logo — a 7px accent dot plus the site name (DESIGN.md §5).
+ * Lived in _site-header.scss until the header was reverted to al-folio's own;
+ * the footer is the only thing that still uses it.
+ * -------------------------------------------------------------------------- */
+
+.site-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+}
+
+.site-logo__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  flex-shrink: 0;
+}
+
+.site-logo__name {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  line-height: 1;
+}

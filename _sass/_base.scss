@@ -38,10 +38,11 @@ body {
  * Headings
  *
  * DESIGN.md fixes page-title sizes per page (24-30px Georgia) but specifies no
- * in-post h1-h6 scale. The scale below is DERIVED: anchored on the 30px about
- * page title at the top and closing on the 14px body size, so an article never
- * out-shouts its own page title. Confirm it against real post content at
- * M2-S2.3 and move it into the post partial if it needs to differ there.
+ * in-post h1-h6 scale. Each size below is the midpoint between the DESIGN.md
+ * reading (30/22/18/16/15/14px) and al-folio's own Tailwind base
+ * (40/32/28/24/20/16px): al-folio's felt oversized on this palette, DESIGN.md's
+ * felt cramped. Family, weight and colour are DESIGN.md's throughout.
+ * Revisit at M2-S2.3 against real post content.
  * -------------------------------------------------------------------------- */
 
 h1,
@@ -60,29 +61,29 @@ h6 {
 }
 
 h1 {
-  font-size: 30px;
+  font-size: 35px;
   letter-spacing: -0.5px;
 }
 
 h2 {
-  font-size: 22px;
+  font-size: 27px;
   letter-spacing: -0.5px;
 }
 
 h3 {
-  font-size: 18px;
+  font-size: 23px;
 }
 
 h4 {
-  font-size: 16px;
+  font-size: 20px;
 }
 
 h5 {
-  font-size: 15px;
+  font-size: 18px;
 }
 
 h6 {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: var(--weight-medium);
 }
 

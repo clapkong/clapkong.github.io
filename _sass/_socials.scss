@@ -1,0 +1,27 @@
+/*******************************************************************************
+ * Social icons — shared by the about page and the footer.
+ *
+ * `{% social_links %}` (jekyll-socials) emits bare `<a><i class="fa-..."></i></a>`,
+ * and the icon fonts colour themselves through `i::before`. al_folio_core's
+ * `_sass/_components.scss` paints those the full body colour, so on this palette
+ * they read as near-black slabs and only turn warm on hover.
+ *
+ * Here they sit in `--color-meta` at rest — the same warm brown as every other
+ * piece of secondary information on the site — and reach for the accent on hover.
+ * The gem's 0.2s transition is preserved.
+ ******************************************************************************/
+
+.social .contact-icons a i::before,
+.site-footer__socials a i::before {
+  color: var(--color-meta);
+}
+
+.social .contact-icons a:hover i::before,
+.site-footer__socials a:hover i::before {
+  color: var(--color-accent);
+}
+
+/* The note under the about page's icon row. */
+.social .contact-note {
+  color: var(--color-meta);
+}

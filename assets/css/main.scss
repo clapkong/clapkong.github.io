@@ -46,3 +46,6 @@
 /* LOCAL: our base element styling. Loaded LAST so it wins over the gem
    partials above without needing specificity hacks. */
 @use "base";
+@use "site-header";
+@use "site-footer";
+@use "socials";

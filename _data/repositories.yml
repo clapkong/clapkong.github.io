@@ -1,10 +1,11 @@
 github_users:
-  - torvalds
+  - clapkong
   - alshedivat
 
 repo_description_lines_max: 2
 
 github_repos:
+  - clapkong/NLU_PLUS_CW1
   - alshedivat/al-folio
   - jekyll/jekyll
   - twbs/bootstrap
