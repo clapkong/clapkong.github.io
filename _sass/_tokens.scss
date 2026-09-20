@@ -1,0 +1,82 @@
+/*******************************************************************************
+ * Design tokens — the single source of truth for this site's visual system.
+ *
+ * Ported from `.claude/reference/DESIGN.md` §2 (color), §3 (typography),
+ * §4 (spacing & layout). Nothing here references al-folio; `_themes.scss`
+ * is the adapter that maps these onto the gem's `--global-*` contract.
+ *
+ * Values marked `derived` are not in DESIGN.md and were chosen to stay inside
+ * the system; revisit them if DESIGN.md ever specifies one.
+ ******************************************************************************/
+
+:root {
+  /* --- Backgrounds -------------------------------------------------------- */
+  --color-base: #faf8f5; /* Cream white. Page background. */
+  --color-surface: #ffffff; /* Pure white. Card backgrounds. */
+
+  /* --- Pinks (the accent system) ------------------------------------------ */
+  --color-soft: #f4c2c2; /* Blush. Active states, badge bg, avatar. */
+  --color-soft-bg: #fbeaf0; /* Lighter blush. Callout bg, badge bg. */
+  --color-accent: #c99696; /* Deep blush. CTAs, active text, emphasis. */
+
+  /* --- Text --------------------------------------------------------------- */
+  --color-text: #2d2d2d; /* Warm dark. Body text. Never pure black. */
+  --color-meta: #8b7355; /* Warm brown. Meta, secondary, inactive nav. */
+
+  /* --- Borders & dividers ------------------------------------------------- */
+  /* Translucent dark, never a solid grey — the translucency is what makes the
+     design feel soft (DESIGN.md §2 usage rules). */
+  --color-border: rgba(45, 45, 45, 0.08);
+  --color-border-hover: rgba(45, 45, 45, 0.15);
+  --color-divider-soft: rgba(45, 45, 45, 0.04);
+
+  /* --- Code surface (derived) --------------------------------------------- */
+  /* DESIGN.md specifies no code-block background; the note-callout warm neutral
+     keeps code inside the palette instead of introducing a cool grey. */
+  --color-code-bg: #f1efe8;
+
+  /* --- Callout backgrounds (post body only) ------------------------------- */
+  --callout-tip-bg: #fbeaf0;
+  --callout-tip-label: #c99696;
+  --callout-note-bg: #f1efe8;
+  --callout-note-label: #8b7355;
+  --callout-warning-bg: #faeeda;
+  --callout-warning-label: #ba7517;
+  --callout-important-bg: #faece7;
+  --callout-important-label: #d85a30;
+  --callout-example-bg: #eaf3de;
+  --callout-example-label: #639922;
+  --callout-paper-bg: #eeedfe;
+  --callout-paper-label: #534ab7;
+  --callout-thought-bg: #e1f5ee;
+  --callout-thought-label: #1d9e75;
+
+  /* --- Typography (DESIGN.md §3) ------------------------------------------ */
+  --font-serif: Georgia, "Noto Serif KR", serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Pretendard", system-ui, sans-serif;
+  --font-mono: "SF Mono", "JetBrains Mono", Monaco, Consolas, monospace;
+
+  /* Only 400 and 500 exist. 600+ reads corporate (DESIGN.md §3). */
+  --weight-regular: 400;
+  --weight-medium: 500;
+
+  /* --- Border radius (DESIGN.md §4) --------------------------------------- */
+  /* Never 0, never above 12px except pills and circles. */
+  --radius-sm: 4px; /* Small badges, segmented items, inline pills */
+  --radius-md: 6px; /* Cards, callouts, dropdowns, page containers */
+  --radius-pill: 12px; /* Tag pills, category badges */
+  --radius-full: 50%; /* Avatar, timeline dots, status dot */
+
+  /* --- Spacing & layout (DESIGN.md §4) ------------------------------------ */
+  --page-max-width: 1200px;
+  --page-gutter: 28px; /* Outer container side padding */
+  --page-gutter-wide: 80px; /* Single-column page bodies */
+  --column-gap: 24px; /* Between columns in 3-column layouts */
+  --sidebar-left-width: 200px; /* Categories */
+  --sidebar-right-width: 180px; /* Stats / TOC */
+
+  --space-section: 42px; /* Between major labelled sections */
+  --space-paragraph: 14px; /* Between paragraphs */
+  --space-card: 20px; /* Inside a card */
+  --space-list-item: 20px; /* Blog feed entry padding/margin */
+}

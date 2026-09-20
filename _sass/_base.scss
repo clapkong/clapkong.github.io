@@ -1,0 +1,228 @@
+/*******************************************************************************
+ * Base element styling — this site's own, not an override of a gem partial.
+ *
+ * Loaded last from `assets/css/main.scss`, so it wins over the gem's Sass
+ * partials. It also wins over `assets/css/tailwind.css`: that file is entirely
+ * inside `@layer base/components/utilities`, and unlayered CSS beats layered
+ * CSS in the cascade regardless of link order. No `!important` needed.
+ *
+ * Scope: DESIGN.md §3 (typography) and §4 (border radius). Per-page and
+ * per-component styling belongs in its own partial, added during M2.
+ ******************************************************************************/
+
+/* -----------------------------------------------------------------------------
+ * Document
+ * -------------------------------------------------------------------------- */
+
+html {
+  /* The gem's Tailwind base sets 16px; DESIGN.md's type scale is absolute px,
+     so the root size is only a fallback for rem-based gem rules. */
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  /* Replaces the Tailwind base's `Roboto, sans-serif` at weight 300. Weight 300
+     is outside the 400/500 system (DESIGN.md §3 font weight rules). */
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: var(--weight-regular);
+  line-height: 1.75;
+  color: var(--color-text);
+  background-color: var(--color-base);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* -----------------------------------------------------------------------------
+ * Headings
+ *
+ * DESIGN.md fixes page-title sizes per page (24-30px Georgia) but specifies no
+ * in-post h1-h6 scale. The scale below is DERIVED: anchored on the 30px about
+ * page title at the top and closing on the 14px body size, so an article never
+ * out-shouts its own page title. Confirm it against real post content at
+ * M2-S2.3 and move it into the post partial if it needs to differ there.
+ * -------------------------------------------------------------------------- */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-serif);
+  /* Never above 500. Size and the serif do the work (DESIGN.md §3). */
+  font-weight: var(--weight-regular);
+  color: var(--color-text);
+  line-height: 1.25;
+  margin-top: 0;
+  margin-bottom: 0.5em;
+}
+
+h1 {
+  font-size: 30px;
+  letter-spacing: -0.5px;
+}
+
+h2 {
+  font-size: 22px;
+  letter-spacing: -0.5px;
+}
+
+h3 {
+  font-size: 18px;
+}
+
+h4 {
+  font-size: 16px;
+}
+
+h5 {
+  font-size: 15px;
+}
+
+h6 {
+  font-size: 14px;
+  font-weight: var(--weight-medium);
+}
+
+/* -----------------------------------------------------------------------------
+ * Text
+ * -------------------------------------------------------------------------- */
+
+p {
+  margin-top: 0;
+  margin-bottom: var(--space-paragraph);
+}
+
+a {
+  color: var(--color-accent);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+}
+
+strong,
+b {
+  /* 600/700 reads corporate; 500 on this palette is bold enough (DESIGN.md §3). */
+  font-weight: var(--weight-medium);
+}
+
+small {
+  font-size: 11px;
+  color: var(--color-meta);
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--color-border);
+  margin: var(--space-section) 0;
+}
+
+blockquote {
+  margin: var(--space-paragraph) 0;
+  padding-left: 16px;
+  border-left: 2px solid var(--color-soft);
+  color: var(--color-meta);
+}
+
+::selection {
+  background: var(--color-soft-bg);
+  color: var(--color-text);
+}
+
+/* -----------------------------------------------------------------------------
+ * Code
+ * -------------------------------------------------------------------------- */
+
+code,
+kbd,
+samp,
+pre {
+  font-family: var(--font-mono);
+}
+
+code {
+  font-size: 0.9em;
+  background: var(--color-code-bg);
+  border-radius: var(--radius-sm);
+  padding: 0.15em 0.4em;
+}
+
+pre {
+  background: var(--color-code-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-card);
+  overflow-x: auto;
+  line-height: 1.6;
+
+  /* An inline-code chip inside a block would double the background. */
+  code {
+    background: none;
+    border-radius: 0;
+    padding: 0;
+    font-size: 13px;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+ * Tables
+ * -------------------------------------------------------------------------- */
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: var(--space-paragraph);
+}
+
+th,
+td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: top;
+}
+
+th {
+  font-family: var(--font-serif);
+  font-weight: var(--weight-medium);
+  font-size: 13px;
+}
+
+/* -----------------------------------------------------------------------------
+ * Focus — PRODUCT.md accessibility: every interactive element gets a visible
+ * focus state, 2px pink outline. `:focus-visible` so a mouse click does not
+ * light it up, only keyboard navigation.
+ * -------------------------------------------------------------------------- */
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* -----------------------------------------------------------------------------
+ * Radius cap — DESIGN.md §4: never sharp corners, never above 12px except pills
+ * and circles. The gem's Tailwind component layer hardcodes 0.25rem/0.125rem on
+ * `.card` and `.btn`; realign them with the token scale.
+ * -------------------------------------------------------------------------- */
+
+.card {
+  border-radius: var(--radius-md);
+}
+
+.btn,
+.btn-sm {
+  border-radius: var(--radius-sm);
+}
+
+.rounded,
+.rounded-sm,
+.rounded-lg {
+  border-radius: var(--radius-md);
+}

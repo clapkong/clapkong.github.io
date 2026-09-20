@@ -1,0 +1,93 @@
+/*******************************************************************************
+ * Themes — LOCAL OVERRIDE of al_folio_core's `_sass/_themes.scss`.
+ *
+ * Purpose: adapt this site's design tokens (`_tokens.scss`) onto the gem's
+ * `--global-*` contract. Those variables are consumed by both style layers —
+ * the Sass partials AND the gem's prebuilt `assets/css/tailwind.css`, whose
+ * `bg-card` / `text-text` / `border-divider` utilities compile down to
+ * `var(--global-*)`. Setting them here therefore re-skins both layers at once.
+ * This is the SCSS token bridge described in docs/CUSTOMIZE.md §Technology Stack.
+ *
+ * Differences from the gem's version:
+ *   - `html[data-theme="dark"]` and the `[data-theme-setting]` blocks are gone.
+ *     This site is single-theme cream; `enable_darkmode: false` in _config.yml.
+ *   - The light-toggle icon rules (`.fa-half-sun-moon`, `#light-toggle-*`) are
+ *     gone with it — nothing renders that control any more.
+ *   - `.only-light` / `.only-dark` are kept: they are content-level helpers, and
+ *     with no dark theme `.only-dark` must stay hidden unconditionally.
+ *
+ * Run `bundle exec al-folio upgrade overrides audit` after touching this file
+ * so `.al-folio-overrides.yml` records the upstream checksum it was based on.
+ ******************************************************************************/
+@use "variables" as v;
+@use "tokens";
+
+:root {
+  color-scheme: light;
+
+  /* Surfaces */
+  --global-bg-color: var(--color-base);
+  --global-card-bg-color: var(--color-surface);
+  --global-code-bg-color: var(--color-code-bg);
+  --global-newsletter-bg-color: var(--color-surface);
+
+  /* Text */
+  --global-text-color: var(--color-text);
+  --global-text-color-light: var(--color-meta);
+  --global-newsletter-text-color: var(--color-text);
+  --global-distill-app-color: var(--color-meta);
+
+  /* Accent. `--global-theme-color` is the gem's link/active color and is the
+     single most visible variable in the whole contract. */
+  --global-theme-color: var(--color-accent);
+  --global-hover-color: var(--color-accent);
+  --global-hover-text-color: var(--color-base);
+  --global-highlight-color: var(--color-accent);
+
+  /* Footer. The gem defaults to a dark slab; DESIGN.md §7 keeps the footer on
+     the cream base, separated only by a hairline top border. */
+  --global-footer-bg-color: var(--color-base);
+  --global-footer-text-color: var(--color-meta);
+  --global-footer-link-color: var(--color-text);
+
+  /* Dividers */
+  --global-divider-color: var(--color-border);
+
+  /* Back-to-top */
+  --global-back-to-top-bg-color: rgba(45, 45, 45, 0.4);
+  --global-back-to-top-text-color: var(--color-base);
+
+  /* Alert blocks. The gem ships three (tip/warning/danger) in green/yellow/red.
+     Mapped onto the DESIGN.md §2 callout palette so they match the seven
+     callouts M4-S4.1 will add. */
+  --global-tip-block: var(--callout-tip-label);
+  --global-tip-block-bg: var(--callout-tip-bg);
+  --global-tip-block-text: var(--color-text);
+  --global-tip-block-title: var(--callout-tip-label);
+  --global-warning-block: var(--callout-warning-label);
+  --global-warning-block-bg: var(--callout-warning-bg);
+  --global-warning-block-text: var(--color-text);
+  --global-warning-block-title: var(--callout-warning-label);
+  --global-danger-block: var(--callout-important-label);
+  --global-danger-block-bg: var(--callout-important-bg);
+  --global-danger-block-text: var(--color-text);
+  --global-danger-block-title: var(--callout-important-label);
+
+  .only-light {
+    display: block;
+  }
+
+  .only-dark {
+    display: none;
+  }
+
+  #back-to-top {
+    color: var(--global-back-to-top-text-color);
+    background: var(--global-back-to-top-bg-color);
+    bottom: v.$back-to-top-bottom;
+    right: v.$back-to-top-right;
+    height: v.$back-to-top-height;
+    width: v.$back-to-top-width;
+    z-index: v.$back-to-top-z-index;
+  }
+}

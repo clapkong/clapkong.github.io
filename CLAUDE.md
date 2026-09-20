@@ -50,7 +50,15 @@ Remaining gates:
 
 Ported from the `previous` repo. The log is gitignored, so it is a local record, not repo history — `git log` is the shared one. It exists to answer "what did the last session actually do, and why" without re-reading a diff.
 
-**Write an entry when a stage in [`.claude/PLAN.md`](.claude/PLAN.md) reaches a real end state** — done, or abandoned with a reason. Not for clarifying questions, reads, or a half-finished edit that the next message will change.
+Three files, three jobs — keep each fact in one of them:
+
+| file                   | answers                                                                                 |
+| ---------------------- | --------------------------------------------------------------------------------------- |
+| `.claude/PLAN.md`      | why the plan is what it is; §0.5 is the current-state summary a new session reads first |
+| `.claude/PROGRESS.md`  | what is left — the stage tracker (`[ ]` `[x]` `[-]` `[?]`)                              |
+| `.claude/BUILD_LOG.md` | what happened and why, append-only                                                      |
+
+**Write an entry when a stage in `PROGRESS.md` reaches a real end state** — done, or abandoned with a reason. Not for clarifying questions, reads, or a half-finished edit that the next message will change. Tick the box in `PROGRESS.md` in the same breath.
 
 **Append to the end of the file. Never insert.** New entries go after the file's last `---`, so the file always reads oldest at top, newest at bottom. Inserting at the `<!-- ENTRIES_START -->` marker reverses that order, which is how the log in `previous` got scrambled.
 
