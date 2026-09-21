@@ -1,0 +1,45 @@
+/*******************************************************************************
+ * Publications — button row ordering.
+ *
+ * al_folio_core's `_layouts/bib.liquid` emits the buttons in a fixed sequence
+ * (award, Abs, DOI, arXiv, HAL, Bib, HTML, PDF, Supp, Video, Code, …), which
+ * interleaves the two kinds: `Abs` and `Bib` expand a panel in place, while the
+ * rest navigate away. With a partial set — one entry has a DOI, another an HTML
+ * link — the row reads as an arbitrary sequence rather than a group.
+ *
+ * Grouping them fixes that without overriding the layout. Only `award`,
+ * `abstract` and `bibtex` carry identifying classes; every link button shares
+ * `btn btn-sm z-depth-0`, so they cannot be reordered individually — but they
+ * do not need to be. Pulling the in-place buttons to the front leaves the links
+ * in their existing order behind them, which is enough to read as two groups:
+ *
+ *   [ Abs  Bib ] [ DOI  PDF  Code ]
+ *     in place       leaves the page
+ *
+ * Rule order matters here: `.abstract` and `.bibtex` also carry `.btn`, so the
+ * catch-all has to come FIRST or it wins on equal specificity and flattens the
+ * grouping back out.
+ ******************************************************************************/
+
+.publications .links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Catch-all: anything without an identifying class is a link out. */
+.publications .links .btn {
+  order: 3;
+}
+
+.publications .links .award {
+  order: 0;
+}
+
+.publications .links .abstract {
+  order: 1;
+}
+
+.publications .links .bibtex {
+  order: 2;
+}

@@ -48,7 +48,7 @@ Remaining gates:
 
 ## Session log — `.claude/BUILD_LOG.md`
 
-Ported from the `previous` repo. The log is gitignored, so it is a local record, not repo history — `git log` is the shared one. It exists to answer "what did the last session actually do, and why" without re-reading a diff.
+Ported from the `previous` repo. It exists to answer "what did the last session actually do, and why" without re-reading a diff. **It is committed** — `.gitignore` excludes `.claude/*` but un-ignores this one file, so it travels with the repo and reads the same from a fresh clone. `PLAN.md` and `PROGRESS.md` stay local. Being committed makes it public: keep it to reasoning about the work, not to anything you would not put in a commit message.
 
 Three files, three jobs — keep each fact in one of them:
 
@@ -57,6 +57,8 @@ Three files, three jobs — keep each fact in one of them:
 | `.claude/PLAN.md`      | why the plan is what it is; §0.5 is the current-state summary a new session reads first |
 | `.claude/PROGRESS.md`  | what is left — the stage tracker (`[ ]` `[x]` `[-]` `[?]`)                              |
 | `.claude/BUILD_LOG.md` | what happened and why, append-only                                                      |
+
+**The log holds the reasoning, so code comments and commit messages should not repeat it.** Once a decision is written up here, a comment or a commit body that re-argues it is the same fact in three places — and the two copies outside `.claude/` are the ones that go stale. Keep in the code only what a reader needs _at that line_ and cannot infer from it: a non-obvious constraint, a hook that fails silently, a value whose source is elsewhere. Keep in the commit message what `git log` alone must answer: what changed and why, in a few lines. Everything else — what was tried, what was rejected, what surprised us — belongs in the log and nowhere else.
 
 **Write an entry when a stage in `PROGRESS.md` reaches a real end state** — done, or abandoned with a reason. Not for clarifying questions, reads, or a half-finished edit that the next message will change. Tick the box in `PROGRESS.md` in the same breath.
 

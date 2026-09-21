@@ -6,8 +6,7 @@ title: clapkong # the website title (if blank, full name will be used instead)
 first_name: Soobin
 middle_name:
 last_name: Park
-contact_note: >
-  Email is the best way to reach me.
+contact_note: # 비워두면 about 아이콘 줄 아래 문구가 사라진다
 description: > # 검색 결과·SNS 공유 카드에 그대로 노출된다. 한 문장으로.
   Paper notes and a development journal by Soobin Park, an AI/ML developer.
 footer_text: >
@@ -355,8 +354,10 @@ display_categories: ["external-services"] # these categories will be displayed o
 # -----------------------------------------------------------------------------
 
 scholar:
-  last_name: [Einstein]
-  first_name: [Albert, A.]
+  # 이 이름과 일치하는 저자가 publications 목록에서 밑줄 처리된다.
+  # BibTeX에 나타나는 모든 표기를 적어야 한다 — Scholar는 "S Park"으로 줄여 쓴다.
+  last_name: [Park]
+  first_name: [Soobin, S.]
 
   style: apa
   locale: en

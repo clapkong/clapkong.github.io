@@ -20,6 +20,8 @@ vendor
 __pycache__/
 *.pyc
 
-# 내가 추가한 Claude 작업 문서 — 로컬 전용 (.claude/skills 심볼릭 링크는 al-folio 것이라 유지)
+# Claude 작업 문서. PLAN·PROGRESS 는 로컬 전용, BUILD_LOG 는 커밋한다(CLAUDE.md § Session log).
+# .claude/skills 심볼릭 링크는 al-folio 것이라 유지.
 .claude/*
 !.claude/skills
+!.claude/BUILD_LOG.md

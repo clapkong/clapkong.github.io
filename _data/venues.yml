@@ -1,9 +1,10 @@
-"AJP":
-  url: https://aapt.scitation.org/journal/ajp
-  color: "#00369f"
+# papers.bib 의 `abbr` 값과 여기 키가 일치하면 배지에 색과 링크가 붙는다.
+# 색은 DESIGN.md §2 팔레트에서 고른다 — al-folio 기본값(형광 초록·파랑)은 이 사이트와 안 맞는다.
 
-"PhysRev":
-  url: https://journals.aps.org/
+"KDD":
+  url: https://kdd.org/
+  color: "#C99696" # --color-accent
 
-"Vision":
-  color: "#009f36"
+"ICLR-W":
+  url: https://iclr.cc/
+  color: "#8B7355" # --color-meta. 정식 논문이 아니므로 한 단계 낮춘다
