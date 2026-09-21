@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="clapkong">
+  <!-- Site mark: DESIGN.md §5's accent dot, on nothing.
+       Transparent so the browser's own tab colour shows through in both light
+       and dark chrome. The dot is sized well above the header's 7px ratio
+       because a favicon renders at 16px. -->
+  <circle cx="50" cy="50" r="34" fill="#C99696" />
+</svg>

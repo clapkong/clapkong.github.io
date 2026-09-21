@@ -69,9 +69,8 @@ grep -q 'al_marimo' "${default_site}/index.html" && fail "home page wrongly load
 
 # --- al_email_protect -------------------------------------------------------
 
-# Off by default, so this builds with an override rather than changing the
-# shipped config: turning it on for the demo site would flip the default for
-# everyone who copies this template.
+# Both directions are built from explicit overrides so this file asserts the
+# plugin's gating rather than whatever `_config.yml` currently prefers.
 override="${tmp_dir}/protect-email.yml"
 printf 'protect_email: true\n' >"${override}"
 protected_site="$(build protected --config "_config.yml,${override}")"
@@ -92,8 +91,20 @@ grep -q 'assets/al_email_protect/css/email-protect.css' "${protected_site}/index
 [ -f "${protected_site}/assets/al_email_protect/css/email-protect.css" ] \
   || fail "email-protect stylesheet referenced but not published"
 
-# ...and with it off (the default), the plugin costs nothing.
-grep -q 'al_email_protect' "${default_site}/index.html" \
+# ...and with it off, the plugin costs nothing.
+#
+# Built from an explicit override rather than from the shipped `_config.yml`.
+# Upstream's default is `protect_email: false`, so the plain `default_site`
+# build used to serve as the "off" case — but this site sets it to `true`
+# (every page carries a contact address, and the protection is worth having),
+# which made the assertion fail on a correct config. What the check is actually
+# for is the gating: off means nothing is emitted. Overriding both directions
+# tests that and stops the result depending on what this site happens to prefer.
+unprotected_override="${tmp_dir}/no-protect-email.yml"
+printf 'protect_email: false\n' >"${unprotected_override}"
+unprotected_site="$(build unprotected --config "_config.yml,${unprotected_override}")"
+
+grep -q 'al_email_protect' "${unprotected_site}/index.html" \
   && fail "email-protect assets loaded while disabled"
 
 echo "new plugin integration checks passed"
