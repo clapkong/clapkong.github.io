@@ -3,7 +3,7 @@ layout: profiles
 permalink: /people/
 title: people
 description: members of the lab or group
-nav: true
+nav: false # 메뉴에서 내림 (2026-09-21). 페이지는 남겨둔다
 nav_order: 7
 
 profiles:

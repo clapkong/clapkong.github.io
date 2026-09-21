@@ -493,3 +493,80 @@ id 가드를 `videoId === "REPLACE_WITH_YOUTUBE_ID"`에서 `!videoId`로 단순�
 **곡 제목 링크 터치 영역(18px)도 유지.** 재생은 버튼이, 출처는 제목이 맡아 역할이 갈려 있고 제목 링크는 필수 동작이 아니다. 필요해지면 재생 버튼에 쓴 `::after` 방식을 그대로 복사하면 된다.
 
 **최종 16/20.** 남은 감점은 접근성 2점(`_tokens.scss` 팔레트, 사이트 전역 사안), 반응형 1점(위 터치 영역), 테마 1점(위 하드코딩 3건). 셋 다 이유가 분명하고 여기에 적혀 있다.
+
+---
+
+## [2026-09-21 15:30 KST] M2-S2.6 준비 — repositories 를 메뉴에서 내리고 projects 로 흡수 결정
+
+**Status**: ⚠️ partial
+**Files**:
+
+- modified: \_pages/repositories.md (`nav: true` -> `nav: false`)
+- modified: .claude/PROGRESS.md (S2.6 에 흡수 계획과 gem 카드 함정 3건, 미결 5번 해소)
+- created: \_sass/\_section-label.scss (빈 플레이스홀더)
+- created: \_sass/\_projects-site.scss (빈 플레이스홀더)
+
+**Summary**: repositories 페이지가 촌스럽다는 지적에서 출발했는데, 원인이 스타일이 아니라
+구조였다. 페이지 전체가 `github-stats-extended.vercel.app` 이 그려 보내는 PNG 이고
+(빌드 결과에서 확인, 외부 요청 20건) 카드 색·폰트가 그림 안에 구워져 있어 `_tokens.scss` 가
+닿는 데가 이미지 바깥 여백뿐이었다. 다크 이미지 10장은 M1-S1.5 에서 다크모드를 지운 뒤에도
+계속 받고 있었고, vercel 이 죽으면 `onerror` 가 카드를 숨겨 페이지가 조용히 빈다.
+
+넷을 비교(현행 유지 / 자체 카드 / 삭제 / projects 흡수)한 결과 사용자가 **흡수**를 택했다.
+결정의 근거는 디자인이 아니라 내용이었다: GitHub API 실측으로 공개 레포가 4개, 전부 star 0,
+둘이 같은 수업 과제고 하나는 이 사이트 자체, 하나는 `test` 였다. 자체 카드를 예쁘게 만들어도
+채울 게 3장이라 디자인이 내용보다 커진다.
+
+**흡수라고 불렀지만 실제로 옮겨올 기능은 없다.** gem `_includes/projects.liquid` 가 이미
+optional `github:` 를 지원한다. 그래서 이번에는 `nav: false` 만 내리고 나머지는 S2.6 으로 넘겼다.
+페이지와 `_data/repositories.yml` 은 남겨 뒀다. 되돌리기가 한 줄이기 때문이다.
+
+**중간에 드러난 사실 하나.** `assets/css/main.scss` 52/54 행의 `@use "section-label"` 과
+`@use "projects-site"` 가 존재하지 않는 파티셜을 가리켜 **Sass 빌드가 이미 깨져 있었다**
+(`Can't find stylesheet to import`). 마지막 성공 빌드가 14:39 인 것과 맞는다. 이 레포는
+로더 충돌을 피하려고 `@use` 줄을 미리 걸어 두는 관행이 있고(커밋된 `_about.scss` 헤더가 그렇게
+적고 있다), 그 짝이 되는 플레이스홀더 파일이 빠져 있었다. 규칙 없는 빈 파일 둘을 놓아
+빌드를 되살렸다(5.7초). 두 파일의 실제 내용은 그 자리를 맡은 세션 몫이다.
+
+**시도했다가 되돌린 것**: `.section-label` 을 `_about.scss` 에서 새 파티셜로 옮기고
+`_includes/projects.liquid` 를 shadowing 해 source 알약까지 구현했으나, 여러 세션이 동시에
+작업 중이라 사용자 요청으로 전부 철회했다. 되돌릴 때 `_sass/_about.scss` 는
+`git checkout` 을 쓰지 않았다. 그 파일에는 다른 세션의 미커밋 about 작업 200줄이 들어 있어
+같이 날아갈 뻔했다. 지웠던 블록만 손으로 복원했다.
+
+---
+
+## [2026-09-21 15:45 KST] M2-S2.1 후속 — 헤더 드롭다운, 다크모드, /secret/
+
+**Status**: ✅ completed
+**Files**:
+
+- created: `_pages/secret.md`, `_sass/_secret.scss`
+- modified: `_includes/header.liquid`, `_sass/_site-header.scss`, `_sass/_themes.scss`
+- modified: `_config.yml`, `assets/css/main.scss`, `_pages/dropdown.md`, `_pages/profiles.md`, `robots.txt`
+
+**Summary**: DESIGN.md §6의 우측 드롭다운을 되살리고, 그 안에 theme 세그먼트 컨트롤을 넣고, `/secret/`를 만들었다.
+
+**드롭다운을 두 번 잃었다가 되찾은 것이다.** 처음엔 헤더를 백지에서 쓰며 만들었다가 진행바가 깨져 헤더째 되돌렸고, 그다음엔 `submenus`를 메뉴에서 내리며 그 캐럿까지 사라졌다. 이번엔 gem의 `.navbar-nav` **안에** 넣어서 `nav-toggle.js`가 그대로 구동한다 (`.dropdown` + `.dropdown-menu` + `data-nav-dropdown-toggle`, 바깥 클릭·ESC 포함). 검색은 메뉴 줄에서 패널 안 `command palette` 행으로 옮겼는데, `#search-toggle .nav-link`는 al_search가 macOS에서 `⌘ k`로 덮어쓰는 자리라 그대로 유지했다.
+
+**설정 항목을 무엇으로 채울지가 이 세션에서 가장 오래 걸린 논의였다.** previous의 3줄(language / font size / theme) 중 **둘은 previous에서도 동작하지 않았다** — `preferences.js`가 `<html lang>` 속성만 바꾸고 `_data/i18n/`은 `.gitkeep`뿐이다. 후보를 아홉 개까지 냈지만(width, font, motion, code theme, depth, 북마크, 집중 모드 …) 사용자가 전부 "짜친다"고 했고, 그게 맞았다. **껍데기를 먼저 정하고 내용물을 찾는 순서가 거꾸로였다.** 결론은 theme 하나. 나머지는 블로그를 만들다 필요가 생기면 붙인다.
+
+`font size`는 값어치가 아니라 **구조 때문에** 기각했다. 우리 타이포가 전부 px 고정이라 S/M/L을 만들려면 rem 전면 전환이 따라온다. `language`는 gem 레이아웃/인클루드 60개에 영어 문자열 30개가 박혀 있어 전부 복사해야 하고, 그 복사가 이 세션에서 반복해 밟은 함정(마크업 훅 유실)을 수십 배로 키운다. PLAN S4.5에 대안(글별 `lang: ko` + 영어 요약 + 번역 링크)을 적어뒀다.
+
+**theme 세그먼트에 함정이 둘 있었다.** ① `theme.js`의 `initTheme`가 `getElementById("light-toggle")`을 **널 체크 없이** 잡는다. 없으면 DOMContentLoaded에서 throw하고 테마가 아예 초기화되지 않는다. 그런데 그 버튼의 동작은 3상태 **순환**이라 세그먼트와 맞지 않아, 보이지 않는 shim으로 남기고 세그먼트는 `setThemeSetting()`을 직접 부른다. ② 다크를 켰는데 **배경이 안 바뀌었다.** 우리 파셜이 `var(--color-base)`처럼 토큰을 직접 써서 gem의 `--global-*`만 덮는 방식이 닿지 않았다. **다크에서 토큰 자체를 재정의**하는 방식으로 바꿔 한 번에 해결했다. 덕분에 컴포넌트마다 다크 규칙을 쓸 일이 없다 — `data-theme` 선택자는 `_themes.scss`에만 있다.
+
+**`/secret/`는 처음에 자체 팔레트를 하드코딩했다가, 사용자 지적으로 다크 테마 그 자체를 쓰도록 바꿨다.** 값을 `@mixin dark-tokens`로 빼고 `html[data-theme="dark"]`와 `html:has(.secret)` 둘이 include한다. `_secret.scss`의 하드코딩 색은 0개가 됐다.
+
+여기서 CSS 커스텀 프로퍼티의 함정을 하나 배웠다. `body:has(.secret)`로 걸었더니 본문은 어두운데 **헤더가 크림으로 남았다.** `:root`가 `--global-bg-color: var(--color-base)`를 선언하는 순간 크림으로 치환이 끝나기 때문이다. **치환은 선언된 요소에서 일어나므로**, 자손에서 `--color-base`를 바꿔도 이미 굳은 `--global-*`은 따라오지 않는다. `html:has(.secret)`은 `:root`와 같은 요소라 해결된다.
+
+`/secret/`을 숨기는 데 세 가지가 필요했고 **셋은 서로를 함의하지 않는다**: `nav: false`(메뉴 + al_search 인덱스, 검색은 `nav: true`인 페이지만 담는다), `sitemap: false`(sitemap.xml), `robots.txt`. previous 계획에 있던 `robots: noindex` front matter는 **어느 gem도 읽지 않아 무효**다.
+
+**gem의 높은 특이도에 세 번 막혔다.** `#search-toggle { padding: 0 }`(id 선택자)과 `.navbar .dropdown-menu a:not(.active)`(클래스 2개 + 요소)가 우리 단일 클래스 규칙을 조용히 이겼다. 패널 정렬과 `/secret` 링크 색이 그래서 틀어져 있었다. 해당 규칙만 특이도를 올리고 이유를 주석에 남겼다 — 안 그러면 "왜 이렇게 길게 썼지" 하고 되돌린다.
+
+**병렬 세션에 준 지시가 틀렸다.** "`assets/css/main.scss`는 건드리지 마라"고 했는데, about 세션이 새로 만든 `_section-label.scss`와 `_projects-site.scss`가 **등록되지 못해 CSS가 통째로 로드되지 않았다.** 빌드 에러도 없다. 사용자가 다크모드에서 `bio` 라벨의 이탤릭과 구분선이 사라진 걸 보고 발견했는데, 실은 처음부터 안 먹고 있었다. **한 줄 충돌이 스타일 유실보다 낫다** — 앞으로는 새 파셜을 만들면 `@use`를 직접 추가하도록 한다.
+
+메뉴에서 `people`·`submenus`(안에 bookshelf)를 내렸다. 페이지는 `nav: false`로 남겼다. 메뉴 크기는 13px → 14px로 올렸다가 13px로 되돌렸다.
+
+**검증**: 통합 테스트 7종 PASS, `upgrade audit` blocking 0, prettier PASS, override 5/5 acknowledged. 7개 페이지 전부 HTTP 200 / JS 에러 0, 다크모드도 전 페이지 확인.
+
+**남은 것**: 다크 팔레트 값 셋(`--color-meta` `#a89178`, `--color-accent` `#e3b3b3`, `--color-surface` `#272724`)은 DESIGN.md에 다크 설계가 없어 **내가 정한 임시값**이고 주석에 provisional로 표시했다. 코드블록·콜아웃·이미지는 데모 콘텐츠뿐이라 다크에서 확인하지 못했다. `/secret/`의 위젯 카드는 플레이스홀더다 — previous PLAN S20.2/S20.3이 `{% include widget %}`로 포스트에 삽입하는 구조를 설계해뒀다.

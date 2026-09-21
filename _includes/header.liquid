@@ -122,28 +122,152 @@
               {% endif %}
             {% endif %}
           {% endfor %}
-          {% if site.search_enabled %}
-            <!-- Search -->
-            <li class="nav-item">
-              <button id="search-toggle" type="button" title="Search" aria-label="Open search">
-                <span class="nav-link">ctrl k <i class="fa-solid fa-magnifying-glass"></i></span>
-              </button>
-            </li>
-          {% endif %}
-          {% if site.enable_darkmode %}
-            <!-- Toogle theme mode -->
-            <li class="toggle-container">
-              <button id="light-toggle" type="button" title="Change theme" aria-label="Change color theme">
-                <i class="fa-half-sun-moon" id="light-toggle-system"></i>
-                <i class="fa-solid fa-moon" id="light-toggle-dark"></i>
-                <i class="fa-solid fa-sun" id="light-toggle-light"></i>
-              </button>
-            </li>
-          {% endif %}
+          {%- comment -%}
+            LOCAL EDIT 2 of 2. DESIGN.md §6: a bare chevron on the right opening a
+            small menu. Built inside the gem's `.navbar-nav` so nav-toggle.js
+            drives it: it needs `.dropdown` on the item, `.dropdown-menu` inside,
+            and `data-nav-dropdown-toggle` on the button, and it toggles `.show`
+            on both. `#search-toggle` keeps its `.nav-link` child because
+            al_search rewrites that element to `⌘ k` on macOS.
+          {%- endcomment -%}
+          <li class="nav-item dropdown site-menu">
+            <button
+              type="button"
+              class="site-menu__trigger"
+              data-nav-dropdown-toggle="true"
+              aria-haspopup="true"
+              aria-expanded="false"
+              aria-label="Menu"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </button>
+
+            <div class="dropdown-menu site-menu__panel">
+              {% if site.enable_darkmode %}
+                {%- comment -%}
+                  theme.js owns the state: it stores the setting, resolves
+                  "system" against the OS preference, and repaints highlight,
+                  search and chart themes. These buttons only call into it.
+
+                  `#light-toggle` must exist and stay clickable: `initTheme`
+                  looks it up and binds without a null check, so removing it
+                  throws on DOMContentLoaded and the theme never initialises. It
+                  is the middle segment here rather than a separate control.
+                {%- endcomment -%}
+                <div class="site-menu__row site-menu__row--static">
+                  <span class="site-menu__label">theme</span>
+                  <div class="seg" role="radiogroup" aria-label="Theme">
+                    <button type="button" class="seg__option" data-theme-set="light" role="radio" aria-checked="false">light</button>
+                    <button type="button" class="seg__option" data-theme-set="system" role="radio" aria-checked="false">auto</button>
+                    <button type="button" class="seg__option" data-theme-set="dark" role="radio" aria-checked="false">dark</button>
+                  </div>
+                </div>
+
+                {%- comment -%}
+                  Shim, not a control. `initTheme` in the gem's theme.js does
+                  `document.getElementById("light-toggle").addEventListener(...)`
+                  with no null check, so the id has to exist or the theme never
+                  initialises. Its handler cycles system to light to dark, which
+                  is the wrong behaviour for a segment, so it is kept out of
+                  reach and the segments above call `setThemeSetting` directly.
+                  The three icon ids are referenced by `_sass/_themes.scss`.
+                {%- endcomment -%}
+                <button id="light-toggle" type="button" class="sr-only" tabindex="-1" aria-hidden="true">
+                  <i class="fa-half-sun-moon" id="light-toggle-system"></i>
+                  <i class="fa-solid fa-moon" id="light-toggle-dark"></i>
+                  <i class="fa-solid fa-sun" id="light-toggle-light"></i>
+                </button>
+
+                <div class="site-menu__divider"></div>
+              {% endif %}
+
+              {% if site.search_enabled %}
+                <button id="search-toggle" type="button" class="site-menu__row" title="Search">
+                  <span class="site-menu__label">command palette</span>
+                  <span class="nav-link site-menu__kbd">ctrl k</span>
+                </button>
+              {% endif %}
+
+              <a class="site-menu__row" href="{{ '/feed.xml' | relative_url }}">
+                <span class="site-menu__label">rss feed</span>
+                <svg
+                  class="site-menu__icon"
+                  viewBox="0 0 24 24"
+                  width="12"
+                  height="12"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <circle cx="5" cy="19" r="1" /><path d="M4 4a16 16 0 0 1 16 16" /><path d="M4 11a9 9 0 0 1 9 9" />
+                </svg>
+              </a>
+
+              <div class="site-menu__divider"></div>
+
+              {%- comment -%}
+                DESIGN.md §6 hides the page behind a dim link whose `s` is the only
+                coloured letter. It is meant to be easy to miss.
+              {%- endcomment -%}
+              <a class="site-menu__row site-menu__secret" href="{{ '/secret/' | relative_url }}">
+                <span>&#8594; /<span class="site-menu__secret-s">s</span>ecret</span>
+              </a>
+            </div>
+          </li>
         </ul>
       </div>
     </div>
   </nav>
+  {% if site.enable_darkmode %}
+    <script>
+      // Binds the theme segments to the gem's theme.js. That file owns the
+      // state; this only calls into it and mirrors the result back onto the
+      // buttons. `determineThemeSetting` returns the stored setting, which is
+      // what the segments show, not the resolved light or dark.
+      (function () {
+        var seg = document.querySelector('.site-menu .seg');
+        if (!seg || typeof setThemeSetting !== 'function') return;
+
+        var options = seg.querySelectorAll('.seg__option');
+
+        function sync() {
+          var current = typeof determineThemeSetting === 'function' ? determineThemeSetting() : 'system';
+          options.forEach(function (option) {
+            var on = option.dataset.themeSet === current;
+            option.classList.toggle('is-active', on);
+            option.setAttribute('aria-checked', String(on));
+          });
+        }
+
+        options.forEach(function (option) {
+          option.addEventListener('click', function () {
+            setThemeSetting(option.dataset.themeSet);
+            sync();
+          });
+        });
+
+        // "auto" follows the OS, so the resolved theme can change without a click.
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', sync);
+        sync();
+      })();
+    </script>
+  {% endif %}
+
   {% if site.enable_progressbar %}
     <!-- Scrolling Progress Bar -->
     <progress id="progress" value="0">

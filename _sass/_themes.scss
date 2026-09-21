@@ -9,10 +9,9 @@
  * This is the SCSS token bridge described in docs/CUSTOMIZE.md §Technology Stack.
  *
  * Differences from the gem's version:
- *   - `html[data-theme="dark"]` and the `[data-theme-setting]` blocks are gone.
- *     This site is single-theme cream; `enable_darkmode: false` in _config.yml.
- *   - The light-toggle icon rules (`.fa-half-sun-moon`, `#light-toggle-*`) are
- *     gone with it — nothing renders that control any more.
+ *   - The dark theme is rebuilt at the bottom of this file rather than copied
+ *     from the gem, whose grey and cyan do not belong to this palette. It stays
+ *     inert until `enable_darkmode: true`.
  *   - `.only-light` / `.only-dark` are kept: they are content-level helpers, and
  *     with no dark theme `.only-dark` must stay hidden unconditionally.
  *
@@ -89,5 +88,97 @@
     height: v.$back-to-top-height;
     width: v.$back-to-top-width;
     z-index: v.$back-to-top-z-index;
+  }
+}
+
+/*******************************************************************************
+ * Dark theme
+ *
+ * Inert until `enable_darkmode: true` in `_config.yml`: without it the gem
+ * renders no toggle, and nothing sets `data-theme`.
+ *
+ * The values are not invented. DESIGN.md §2 reserves `#1F1F1D` as the dark
+ * background "for /secret/ and future dark mode", and §8.8 fixes what sits on
+ * it: `#FAF8F5` for the name, `#F4C2C2` for the title, warm brown for meta.
+ * That is a floor, not a designed palette. §2 still says the full dark palette
+ * is undefined, so treat what follows as enough to switch the site on and look
+ * at it, not as the finished thing.
+ ******************************************************************************/
+
+/* The values live in a mixin because two selectors need them: the theme
+   toggle's `data-theme`, and `/secret/`, which is dark whatever the setting is
+   (DESIGN.md §8.8). `_secret.scss` includes this rather than restating it. */
+@mixin dark-tokens {
+  color-scheme: dark;
+
+  /* The design tokens themselves are redefined, not the `--global-*` map below
+     them. Our own partials reach for `--color-text` and `--color-base`
+     directly, so overriding only the gem's variables left the page cream with a
+     dark setting applied. Redefining the tokens moves everything at once. */
+  --color-base: #1f1f1d;
+  --color-surface: #272724;
+  --color-text: #faf8f5;
+
+  /* Warm brown holds up against cream but not against near-black; DESIGN.md
+     §8.8 sanctions it for nav labels only. Lightened here so secondary text
+     stays legible. Provisional, like the rest of this palette. */
+  --color-meta: #a89178;
+
+  /* Deep blush goes muddy on a dark ground, so links and emphasis take the
+     lighter blush DESIGN.md §8.8 already uses on dark. `--color-soft` is
+     unchanged: §8.8 asks for it as-is on this background. */
+  --color-accent: #e3b3b3;
+  --color-soft-bg: rgb(244 194 194 / 10%);
+
+  --color-border: rgb(255 255 255 / 8%);
+  --color-border-hover: rgb(255 255 255 / 16%);
+  --color-divider-soft: rgb(255 255 255 / 4%);
+
+  --color-code-bg: #26261f;
+
+  /* Only the mappings that cannot follow from the tokens above. */
+  --global-hover-text-color: #1f1f1d;
+  --global-back-to-top-bg-color: rgb(250 248 245 / 40%);
+  --global-back-to-top-text-color: #1f1f1d;
+}
+
+html[data-theme="dark"] {
+  @include dark-tokens;
+
+  .only-light {
+    display: none;
+  }
+
+  .only-dark {
+    display: block;
+  }
+}
+
+/* Which icon the toggle shows. The gem's markup renders all three and hides two. */
+html[data-theme-setting="dark"] {
+  #light-toggle-system {
+    display: none;
+  }
+
+  #light-toggle-dark {
+    display: inline-block;
+  }
+
+  #light-toggle-light {
+    display: none;
+  }
+}
+
+html[data-theme-setting="light"] {
+  #light-toggle-system {
+    display: none;
+  }
+
+  #light-toggle-dark {
+    display: none;
+  }
+
+  #light-toggle-light {
+    display: inline-block;
   }
 }

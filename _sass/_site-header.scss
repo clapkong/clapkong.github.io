@@ -49,8 +49,8 @@
 }
 
 /* -----------------------------------------------------------------------------
- * Nav items — 13px, the midpoint between DESIGN.md's 12px and al-folio's
- * inherited 14px. Colour, case and the active underline are DESIGN.md's.
+ * Nav items. Colour, case and the active underline are DESIGN.md's. 13px sits
+ * between DESIGN.md's 12px and al-folio's inherited 14px; both were tried.
  * -------------------------------------------------------------------------- */
 
 .navbar.navbar-light .navbar-nav .nav-item .nav-link {
@@ -200,4 +200,173 @@ progress {
 .navbar-toggler .icon-bar {
   background-color: var(--color-text);
   height: 1.5px;
+}
+
+/* -----------------------------------------------------------------------------
+ * Right-hand menu, DESIGN.md §6
+ *
+ * A bare chevron: no box, no border, no background. The panel is a thin border
+ * with no shadow; the white on cream carries it.
+ * -------------------------------------------------------------------------- */
+
+.navbar .site-menu {
+  display: flex;
+  align-items: center;
+  margin-left: 14px;
+}
+
+.site-menu__trigger {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-meta);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--color-text);
+  }
+}
+
+.navbar .site-menu__panel {
+  /* The gem's `.dropdown-menu` sets `right` and a margin but no `top`, which on
+     a flex nav item lands the panel against the navbar's top edge. */
+  top: calc(100% + 12px);
+  right: 0;
+  left: auto;
+  margin-top: 0;
+  width: 220px;
+  padding: 6px;
+  border: 0.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  box-shadow: none;
+}
+
+.site-menu__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--color-text);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--color-soft-bg);
+    color: var(--color-text);
+    text-decoration: none;
+  }
+}
+
+.site-menu__kbd {
+  /* al_search rewrites this to `⌘ k` on macOS, so it is sized to its content
+     rather than to the literal "ctrl k". */
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--color-base);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--color-meta);
+  white-space: nowrap;
+}
+
+.site-menu__icon {
+  flex-shrink: 0;
+  color: var(--color-meta);
+}
+
+.site-menu__divider {
+  height: 0.5px;
+  margin: 6px 4px;
+  background: var(--color-border);
+}
+
+.site-menu__secret {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--color-meta);
+}
+
+.site-menu__secret-s {
+  color: var(--color-accent);
+}
+
+/* -----------------------------------------------------------------------------
+ * Segmented control, DESIGN.md §6
+ * -------------------------------------------------------------------------- */
+
+.site-menu__row--static {
+  cursor: default;
+
+  &:hover {
+    background: none;
+  }
+}
+
+.seg {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--radius-sm);
+  background: var(--color-base);
+}
+
+.seg__option {
+  padding: 2px 8px;
+  border: 0;
+  border-radius: 3px;
+  background: none;
+  font-family: var(--font-sans);
+  font-size: 9px;
+  color: var(--color-meta);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--color-text);
+  }
+
+  &.is-active {
+    background: var(--color-soft);
+    color: var(--color-text);
+  }
+}
+
+/* -----------------------------------------------------------------------------
+ * Specificity fixes for the two gem-owned pieces inside the panel.
+ *
+ * `#search-toggle` is an id selector in the gem's `_navbar.scss` and zeroes the
+ * padding, and `.site-menu__kbd` also carries `.nav-link`, which the gem styles
+ * through three classes. Both beat a single class, so these selectors are
+ * deliberately heavier than the rules above rather than the rules being raised.
+ * -------------------------------------------------------------------------- */
+
+.site-menu__panel #search-toggle {
+  padding: 6px 10px;
+  color: var(--color-text);
+}
+
+/* The gem also paints every link in a dropdown through
+   `.navbar .dropdown-menu a:not(.active)`, which outranks a single class. */
+.navbar .site-menu__panel a.site-menu__secret {
+  color: var(--color-meta);
+}
+
+.navbar .site-menu__panel a.site-menu__row:hover {
+  color: var(--color-text);
+}
+
+.site-menu__panel .site-menu__kbd.nav-link {
+  display: inline-block;
+  padding: 2px 6px;
+  line-height: 1.4;
 }
