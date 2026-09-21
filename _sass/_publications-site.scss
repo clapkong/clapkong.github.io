@@ -1,35 +1,22 @@
-/*******************************************************************************
- * Publications — button row ordering.
+/* Publications list, DESIGN.md §8.6.
  *
- * al_folio_core's `_layouts/bib.liquid` emits the buttons in a fixed sequence
- * (award, Abs, DOI, arXiv, HAL, Bib, HTML, PDF, Supp, Video, Code, …), which
- * interleaves the two kinds: `Abs` and `Bib` expand a panel in place, while the
- * rest navigate away. With a partial set — one entry has a DOI, another an HTML
- * link — the row reads as an arbitrary sequence rather than a group.
+ * `selected_papers.liquid` reuses this markup on the about page, so only the
+ * page chrome is scoped to `.pub-layout`: the two-column grid, the list grid
+ * and the white card. Everything else applies to both lists.
  *
- * Grouping them fixes that without overriding the layout. Only `award`,
- * `abstract` and `bibtex` carry identifying classes; every link button shares
- * `btn btn-sm z-depth-0`, so they cannot be reordered individually — but they
- * do not need to be. Pulling the in-place buttons to the front leaves the links
- * in their existing order behind them, which is enough to read as two groups:
- *
- *   [ Abs  Bib ] [ DOI  PDF  Code ]
- *     in place       leaves the page
- *
- * Rule order matters here: `.abstract` and `.bibtex` also carry `.btn`, so the
- * catch-all has to come FIRST or it wins on equal specificity and flattens the
- * grouping back out.
- ******************************************************************************/
+ * The gem renders an entry as `li > .row > .col-sm-2 (abbr) + .col-sm-8`. */
 
+/* Order: the gem emits `Bib` in the middle of the link buttons. Only `award`,
+   `abstract` and `bibtex` carry identifying classes, so the catch-all has to
+   come first or it wins on equal specificity. */
 .publications .links {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
 }
 
-/* Catch-all: anything without an identifying class is a link out. */
 .publications .links .btn {
-  order: 3;
+  order: 2;
 }
 
 .publications .links .award {
@@ -41,5 +28,330 @@
 }
 
 .publications .links .bibtex {
-  order: 2;
+  order: 3;
+}
+
+/* -----------------------------------------------------------------------------
+ * Two-column layout with the year jumper
+ * -------------------------------------------------------------------------- */
+
+/* No `align-items`: the default `stretch` is what gives the sticky nav a parent
+   tall enough to travel inside. */
+.pub-layout {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 40px;
+}
+
+.pub-years {
+  position: sticky;
+  top: 84px; /* clears the fixed navbar */
+}
+
+.pub-years__label {
+  margin: 0 0 12px;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 12px;
+  color: var(--color-meta);
+}
+
+.pub-years__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pub-years__link {
+  display: block;
+  padding: 3px 0 3px 10px;
+  border-left: 1.5px solid transparent; /* reserved so `.is-active` cannot shift the column */
+  font-family: var(--font-serif);
+  font-size: 13px;
+  color: var(--color-meta);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  &.is-active {
+    border-left-color: var(--color-accent);
+    color: var(--color-accent);
+    font-weight: var(--weight-medium);
+  }
+}
+
+@media (max-width: 768px) {
+  .pub-layout {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .pub-years {
+    display: none;
+  }
+}
+/* -----------------------------------------------------------------------------
+ * Cards
+ * -------------------------------------------------------------------------- */
+
+.pub-layout .publications ol.bibliography {
+  display: grid;
+  gap: 16px;
+}
+
+/* Centred because every card is given the height of the tallest one in
+   `assets/js/publications.js`. */
+.pub-layout .publications ol.bibliography > li {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-bottom: 0;
+  padding: 18px 22px;
+  border: 0.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  transition: border-color 0.2s ease-in-out;
+
+  &:hover {
+    border-color: var(--color-border-hover);
+  }
+}
+
+/* Two columns whether or not the entry has a thumbnail, so titles line up. */
+.publications ol.bibliography > li .row {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 20px;
+  align-items: stretch;
+  margin: 0;
+}
+
+.publications ol.bibliography > li [class*="col-"] {
+  width: auto;
+  max-width: none;
+  flex: none;
+  padding: 0;
+  min-width: 0; /* grid items default to the content's intrinsic width and overflow the track */
+}
+
+/* -----------------------------------------------------------------------------
+ * Left column: badge and thumbnail
+ * -------------------------------------------------------------------------- */
+
+.publications ol.bibliography > li .abbr {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+/* The column spaces its children with `gap`; the 1rem under every `figure` made
+   a card with a thumbnail 16px taller. */
+.publications ol.bibliography > li .abbr .badge,
+.publications ol.bibliography > li .abbr figure {
+  margin: 0;
+}
+
+/* `display`, not `width`: the badge's `w-100` is `width: 100% !important` inside
+   `@layer components`, and an important declaration in a layer outranks an
+   unlayered one however specific. */
+.publications ol.bibliography > li .abbr .badge {
+  display: block;
+  padding: 3px 10px;
+}
+
+/* Capped so a thumbnail never decides the card height, which every card then
+   matches. */
+.publications ol.bibliography > li .preview {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 52px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+}
+
+.publications ol.bibliography > li .preview.z-depth-1 {
+  box-shadow: none;
+  border: 0.5px solid var(--color-border);
+}
+
+/* -----------------------------------------------------------------------------
+ * Right column: title, authors, venue
+ * -------------------------------------------------------------------------- */
+
+.publications ol.bibliography > li .title {
+  margin-bottom: 5px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+/* `publications.js` wraps the title in an `<a>`, which takes the link colour. */
+.publications ol.bibliography > li .title a {
+  color: var(--color-meta);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+}
+
+.publications ol.bibliography > li .author {
+  margin-bottom: 4px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* The author's own name. al-folio underlines it; DESIGN.md §3 has no underlines
+   in running text. */
+.publications ol.bibliography > li .author > em {
+  border-bottom: 0;
+  font-style: normal;
+  font-weight: var(--weight-medium);
+  color: var(--color-accent);
+}
+
+.publications ol.bibliography > li .periodical {
+  margin-bottom: 12px;
+  font-family: var(--font-serif);
+  font-size: 11px;
+  font-style: italic;
+  line-height: 1.4;
+  color: var(--color-meta);
+
+  /* The venue name sits in an `em`, which the gem colours with the body colour. */
+  em {
+    color: inherit;
+  }
+}
+
+/* The gem emits a second, empty `.periodical` after the venue. */
+.publications ol.bibliography > li .periodical:empty {
+  display: none;
+}
+
+/* -----------------------------------------------------------------------------
+ * Link pills, DESIGN.md §9.13
+ * -------------------------------------------------------------------------- */
+
+.publications ol.bibliography > li .links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 0;
+}
+
+/* `a.btn`, not `.btn`: that is the shape of al-folio's own rule. */
+.publications ol.bibliography > li .links a.btn {
+  margin: 0;
+  padding: 3px 9px;
+  border: 0.5px solid var(--color-accent);
+  border-radius: 3px;
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.5;
+  color: var(--color-accent);
+  transition: opacity 0.2s ease-in-out;
+
+  &:hover {
+    opacity: 0.72;
+    color: var(--color-accent);
+  }
+}
+
+.publications ol.bibliography > li .links a.bibtex {
+  border-color: var(--color-border-hover);
+  color: var(--color-meta);
+
+  &:hover {
+    color: var(--color-meta);
+  }
+}
+
+/* -----------------------------------------------------------------------------
+ * Abstract and bibtex panels
+ * -------------------------------------------------------------------------- */
+
+/* Closed, the gem still draws the abstract's dashed border and leaves padding
+   under the button row. */
+.publications ol.bibliography > li div.hidden:not(.open) {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+/* On `.open` alone, so a shut card keeps its height. */
+.publications ol.bibliography > li div.hidden.open {
+  margin-top: 12px;
+}
+
+.publications ol.bibliography > li div.abstract.hidden.open {
+  border-color: var(--color-meta);
+}
+
+/* The gem sets 0.875rem, larger than the authors line above it. */
+.publications ol.bibliography > li div.hidden {
+  font-size: 12px;
+
+  p {
+    margin: 12px 14px;
+    line-height: 1.7;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+ * Vertical rhythm
+ * -------------------------------------------------------------------------- */
+
+.pub-layout .publications h2.bibliography {
+  margin-top: 32px; /* rule to the card above */
+  padding-top: 3px; /* rule to the year (gem sets 1rem) */
+  margin-bottom: 14px; /* year to the first card below */
+}
+
+/* About has no card holding the entry apart, so each gap gains a pixel.
+   `:not(.pub-layout *)` means "this list, not the one on the publications page". */
+.publications ol.bibliography > li:not(.pub-layout *) {
+  .title {
+    margin-bottom: 6px;
+  }
+
+  .author {
+    margin-bottom: 5px;
+  }
+
+  .periodical {
+    margin-bottom: 13px;
+  }
+}
+
+/* The badge column is a third of a phone-width card, which breaks the title
+   into five lines. Stack instead, and let the badge shrink to its label. */
+@media (max-width: 520px) {
+  .publications ol.bibliography > li .row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .publications ol.bibliography > li .abbr {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  /* `max-width`, since the badge's `width: 100% !important` cannot be unset. */
+  .publications ol.bibliography > li .abbr .badge {
+    max-width: fit-content;
+  }
+
+  .publications ol.bibliography > li .preview {
+    max-width: 120px;
+  }
 }

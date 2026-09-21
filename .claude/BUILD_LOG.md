@@ -570,3 +570,35 @@ optional `github:` 를 지원한다. 그래서 이번에는 `nav: false` 만 내
 **검증**: 통합 테스트 7종 PASS, `upgrade audit` blocking 0, prettier PASS, override 5/5 acknowledged. 7개 페이지 전부 HTTP 200 / JS 에러 0, 다크모드도 전 페이지 확인.
 
 **남은 것**: 다크 팔레트 값 셋(`--color-meta` `#a89178`, `--color-accent` `#e3b3b3`, `--color-surface` `#272724`)은 DESIGN.md에 다크 설계가 없어 **내가 정한 임시값**이고 주석에 provisional로 표시했다. 코드블록·콜아웃·이미지는 데모 콘텐츠뿐이라 다크에서 확인하지 못했다. `/secret/`의 위젯 카드는 플레이스홀더다 — previous PLAN S20.2/S20.3이 `{% include widget %}`로 포스트에 삽입하는 구조를 설계해뒀다.
+
+---
+
+## [2026-09-21 21:40 KST] M2-S2.5: publications 레이아웃
+
+**Status**: ⚠️ partial
+**Files**:
+
+- created: `_sass/_publications-site.scss`, `assets/js/publications.js`, `_includes/scripts.liquid` (gem shadow)
+- modified: `_pages/publications.md`, `_bibliography/papers.bib`, `_data/venues.yml`, `assets/css/main.scss`, `.al-folio-overrides.yml`
+
+**Summary**: DESIGN.md §8.6 을 구현했다. 연도 점프 사이드바 + 논문 카드. `selected_papers.liquid` 가 about 에서 같은 마크업을 쓰므로 타이포와 배지, 알약은 두 페이지가 공유한다. `.pub-layout` 아래에 남긴 것은 2열 그리드와 흰 카드뿐이고, about 은 크림 배경 위에 그대로 올라간다(사용자 결정).
+
+**카드 높이는 JS 로 맞춘다.** jekyll-scholar 가 연도마다 `<ol>` 을 따로 뱉어서 grid 로는 연도를 가로질러 높이를 못 맞춘다. 최대 높이를 재서 전부에 `min-height` 를 준다. 이미지 도착과 리사이즈 때 다시 잰다.
+
+**스크립트를 `assets/js/publications.js` 로 뺐다.** 제목→PDF 링크가 인라인이면 `/publications/` 에서만 돌아서 about 에서는 링크가 안 걸렸다. gem 에 커스텀 JS 훅이 없어서 `_includes/scripts.liquid` 를 그림자로 두고 한 줄만 덧붙였다. `_layouts/about.liquid` 는 다른 세션 소유라 피했다.
+
+**연도 점퍼는 URL 해시를 못 쓴다.** gem 의 `bibsearch.js` 가 이 페이지에서 해시를 검색어로 읽는다. `#year-2023` 을 걸면 검색창에 `year-2023` 이 들어가고 일치하는 항목이 없어서 목록이 통째로 사라진다. 에러도 경고도 없다. 링크는 `href` 를 유지하되 `preventDefault` 하고 `scrollTo` 로 직접 움직인다.
+
+**CSS 에서 몇 번 막혔다.** `!important` 는 `@layer` 안쪽이 이기므로 `.w-100` 을 `width` 로는 못 눌렀다(`display: block` 으로 우회). grid item 은 `min-width: auto` 가 기본이라 텍스트 열이 트랙을 넘쳤다. `align-items: start` 를 주면 sticky 사이드바가 따라 움직인다.
+
+**버튼과 abstract 패널.** gem 이 `Bib` 를 링크 버튼들 사이에 끼워 넣어서 `order` 로 맨 뒤로 뺐다. 색은 `Bib` 만 meta, 나머지는 accent 다. 열린 abstract 는 글씨 14px 가 바로 위 저자 줄보다 커서 12px 로 줄이고, 점선은 본문 검정에서 meta 로 낮췄다. 여백은 `.open` 에만 걸어서 닫힌 카드 높이는 안 변한다.
+
+**커밋 전 impeccable 리뷰에서 세 건.** ① 520px 아래에서 배지 열 120px 이 폰 카드의 3분의 1 을 먹어 제목이 5줄로 쪼개졌다. 한 열로 쌓아서 카드 329px → 245px. 미디어 블록은 파일 맨 끝에 둔다. 중간에 넣었더니 뒤에 오는 같은 특정도의 기본 규칙에 져서 아무 일도 안 일어났다. ② 연도 점프가 `prefers-reduced-motion` 을 무시했다. `behavior` 를 분기한다. ③ 흰 카드 위 accent 글씨(알약, 배지, 활성 연도, 저자명)가 2.53:1 로 AA 미달이다. **사용자가 취향으로 유지하기로 했다.** 고치려면 `--color-accent` 자체를 낮춰야 해서 사이트 전역에 걸린다.
+
+**검증** (더미 삭제 후): publications 카드 2장 전부 137px, about 1장 101px, 제목 링크 3/3, JS 에러 0. 390 / 520 / 521 / 768 / 1280px 가로 스크롤 0, 520px 경계에서 열 전환 확인. reduced motion 켜면 즉시 이동, 끄면 애니메이션. prettier PASS, `overrides accept` 완료.
+
+**남은 것 (이래서 partial)**:
+
+- **제목 크기와 `.post-description`** 은 전역 page chrome 이라 M2 이후로 미뤘다(사용자 결정)
+- **카드 폭 1010px.** previous 는 760px 였다. 같은 전역 결정에 묶인다
+- **`max_author_limit: 3`** 이라 5인 논문이 "2 more authors" 로 접힌다. 미판단

@@ -3,7 +3,7 @@ layout: page
 permalink: /repositories/
 title: repositories
 description: Edit the `_data/repositories.yml` and change the `github_users` and `github_repos` lists to include your own GitHub profile and repositories.
-nav: true
+nav: false # 메뉴에서 내림 (2026-09-21). projects 로 흡수 예정이라 페이지는 남겨둔다
 nav_order: 4
 ---
 

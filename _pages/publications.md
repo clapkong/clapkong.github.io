@@ -7,14 +7,25 @@ nav: true
 nav_order: 2
 ---
 
-<!-- _pages/publications.md -->
+{%- comment -%}
+DESIGN.md §8.6. The year list is filled by `assets/js/publications.js`:
+`{% bibliography %}` renders in one call and does not expose its years.
+{%- endcomment -%}
 
-<!-- Bibsearch Feature -->
+<div class="pub-layout">
+  <div class="pub-years-col">
+    <nav class="pub-years" aria-label="Years">
+      <p class="pub-years__label">years</p>
+      <ul class="pub-years__list"></ul>
+    </nav>
+  </div>
 
-{% include bib_search.liquid %}
+  <div class="pub-main">
+    {% include bib_search.liquid %}
 
-<div class="publications">
+    <div class="publications">
+      {% bibliography %}
+    </div>
 
-{% bibliography %}
-
+  </div>
 </div>
