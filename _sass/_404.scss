@@ -1,0 +1,14 @@
+/*******************************************************************************
+ * 404 page — DESIGN.md §8.9.
+ *
+ * Placeholder. Wired into `assets/css/main.scss` ahead of the work so that the
+ * session doing this page does not touch the loader, which other sessions are
+ * editing.
+ *
+ * Two things to settle before writing anything here:
+ *   - §8.9 asks for Playfair Display at 120px. No webfont is loaded on this site
+ *     (DESIGN.md §3 is Georgia + system sans + mono), so either add one for this
+ *     page alone or fall back to Georgia.
+ *   - `_pages/404.md` sets `redirect: true`, which bounces to the home page
+ *     after three seconds. Nothing designed here is visible until that is off.
+ ******************************************************************************/
