@@ -3,7 +3,7 @@ layout: page
 permalink: /teaching/
 title: teaching
 description: Course materials, schedules, and resources for classes taught.
-nav: true
+nav: false # 메뉴에서 내림 (2026-09-21). 강의 자료가 생기면 다시 올린다
 nav_order: 6
 calendar: true
 ---

@@ -3,7 +3,7 @@
 (function () {
   "use strict";
 
-  // Clears the fixed navbar, matching `.pub-years { top }`.
+  // Clears the fixed navbar, matching tocbot's `headingsOffset`.
   var NAV_OFFSET = 84;
   var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -38,57 +38,58 @@
     });
   }
 
-  function yearJumper() {
-    var list = document.querySelector(".pub-years__list");
-    var headings = document.querySelectorAll(".publications h2.bibliography");
-    if (!list || !headings.length) return;
+  // The gem's `common.js` marks every `.publications h2` `data-toc-skip`, so the
+  // year headings never reach tocbot. On this page they are the only headings
+  // and they are exactly what the sidebar is for, so un-skip and rebuild.
+  function yearSidebar() {
+    var sidebar = document.querySelector("#toc-sidebar");
+    if (!sidebar || !window.tocbot) return;
 
-    var links = [];
+    var headings = document.querySelectorAll(".publications h2");
+    if (!headings.length) return;
 
     headings.forEach(function (heading) {
-      var year = heading.textContent.trim();
-      heading.id = "year-" + year;
+      heading.removeAttribute("data-toc-skip");
+      if (!heading.id) heading.id = "year-" + heading.textContent.trim();
+    });
 
-      var item = document.createElement("li");
-      var link = document.createElement("a");
-      link.href = "#year-" + year;
-      link.textContent = year;
-      link.className = "pub-years__link";
+    if (typeof window.tocbot.destroy === "function") window.tocbot.destroy();
+    window.tocbot.init({
+      tocSelector: "#toc-sidebar",
+      contentSelector: '[role="main"]',
+      headingSelector: "h2, h3",
+      ignoreSelector: "[data-toc-skip]",
+      hasInnerContainers: true,
+      orderedList: false,
+      activeLinkClass: "is-active-link",
+      scrollSmooth: true,
+      scrollSmoothOffset: -80,
+      headingsOffset: 80,
+    });
 
-      // The hash cannot be used to jump: the gem's `bibsearch.js` reads it as
-      // the search query and empties the list. `href` stays for middle-click.
-      link.addEventListener("click", function (event) {
+    var label = document.createElement("p");
+    label.className = "pub-years__label";
+    label.textContent = "years";
+    sidebar.insertBefore(label, sidebar.firstChild);
+
+    // A link click must not reach the URL hash: the gem's `bibsearch.js` reads
+    // it as the search query and empties the list. Capture phase, so tocbot's
+    // own handler never runs.
+    sidebar.addEventListener(
+      "click",
+      function (event) {
+        var link = event.target.closest(".toc-link");
+        if (!link) return;
+        var heading = document.getElementById(decodeURIComponent((link.getAttribute("href") || "").slice(1)));
+        if (!heading) return;
+
         event.preventDefault();
+        event.stopPropagation();
         var top = heading.getBoundingClientRect().top + window.scrollY - NAV_OFFSET;
         window.scrollTo({ top: Math.max(0, top), behavior: reducedMotion.matches ? "auto" : "smooth" });
-      });
-
-      item.appendChild(link);
-      list.appendChild(item);
-      links.push(link);
-    });
-
-    function setActive(year) {
-      links.forEach(function (link) {
-        link.classList.toggle("is-active", link.textContent === year);
-      });
-    }
-
-    setActive(headings[0].textContent.trim());
-
-    // rootMargin pins the trigger line near the top of the viewport.
-    var observer = new IntersectionObserver(
-      function (entries) {
-        entries.forEach(function (entry) {
-          if (entry.isIntersecting) setActive(entry.target.textContent.trim());
-        });
       },
-      { rootMargin: "-80px 0px -70% 0px" }
+      true
     );
-
-    headings.forEach(function (heading) {
-      observer.observe(heading);
-    });
   }
 
   // One height for every card. Each year is its own `ol`, so a grid cannot
@@ -113,7 +114,7 @@
 
   function init() {
     linkTitles();
-    yearJumper();
+    yearSidebar();
     evenCards();
   }
 

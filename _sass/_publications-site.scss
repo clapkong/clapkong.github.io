@@ -1,8 +1,9 @@
 /* Publications list, DESIGN.md §8.6.
  *
  * `selected_papers.liquid` reuses this markup on the about page, so only the
- * page chrome is scoped to `.pub-layout`: the two-column grid, the list grid
- * and the white card. Everything else applies to both lists.
+ * page chrome is scoped to `.pub-layout`: the list grid and the white card.
+ * Everything else applies to both lists. The year sidebar is the gem's tocbot,
+ * turned on by `toc: sidebar: right` in `_pages/publications.md`.
  *
  * The gem renders an entry as `li > .row > .col-sm-2 (abbr) + .col-sm-8`. */
 
@@ -31,68 +32,6 @@
   order: 3;
 }
 
-/* -----------------------------------------------------------------------------
- * Two-column layout with the year jumper
- * -------------------------------------------------------------------------- */
-
-/* No `align-items`: the default `stretch` is what gives the sticky nav a parent
-   tall enough to travel inside. */
-.pub-layout {
-  display: grid;
-  grid-template-columns: 120px 1fr;
-  gap: 40px;
-}
-
-.pub-years {
-  position: sticky;
-  top: 84px; /* clears the fixed navbar */
-}
-
-.pub-years__label {
-  margin: 0 0 12px;
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 12px;
-  color: var(--color-meta);
-}
-
-.pub-years__list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.pub-years__link {
-  display: block;
-  padding: 3px 0 3px 10px;
-  border-left: 1.5px solid transparent; /* reserved so `.is-active` cannot shift the column */
-  font-family: var(--font-serif);
-  font-size: 13px;
-  color: var(--color-meta);
-  text-decoration: none;
-
-  &:hover {
-    color: var(--color-text);
-    text-decoration: none;
-  }
-
-  &.is-active {
-    border-left-color: var(--color-accent);
-    color: var(--color-accent);
-    font-weight: var(--weight-medium);
-  }
-}
-
-@media (max-width: 768px) {
-  .pub-layout {
-    grid-template-columns: 1fr;
-    gap: 0;
-  }
-
-  .pub-years {
-    display: none;
-  }
-}
 /* -----------------------------------------------------------------------------
  * Cards
  * -------------------------------------------------------------------------- */
@@ -353,5 +292,69 @@
 
   .publications ol.bibliography > li .preview {
     max-width: 120px;
+  }
+}
+
+/* The sidebar heading, injected by `assets/js/publications.js`: tocbot renders
+   the list alone. */
+#toc-sidebar .pub-years__label {
+  margin: 0 0 8px;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 11px;
+  color: var(--color-meta);
+}
+
+/* -----------------------------------------------------------------------------
+ * Filter box
+ *
+ * The gem gives it a 350px box with a near-black 1px border and a drop shadow,
+ * which outweighs the cards it filters.
+ * -------------------------------------------------------------------------- */
+
+/* `.post-description` above leaves 32px, and the gem opens `.publications` with
+   another 2rem below. Both are set for a page of prose, not for one small
+   field. */
+.pub-layout {
+  margin-top: -12px;
+}
+
+.pub-layout .publications {
+  margin-top: 16px;
+}
+
+/* The first year heading carries the gem's own 2rem, which would collapse
+   through the rule above and win. */
+.pub-layout .publications > h2.bibliography:first-child {
+  margin-top: 0;
+}
+
+#bibsearch.bibsearch-form-input {
+  width: 100%;
+  max-width: 240px;
+  margin-bottom: 4px;
+  padding: 6px 10px;
+  border: 0.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  box-shadow: none;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-text);
+  transition: border-color 0.2s ease-in-out;
+
+  &:hover {
+    border-color: var(--color-border-hover);
+  }
+
+  &:focus {
+    border-color: var(--color-accent);
+  }
+
+  &::placeholder {
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: var(--color-meta);
   }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Base element styling — this site's own, not an override of a gem partial.
+ * Base element styling: this site's own, not an override of a gem partial.
  *
  * Loaded last from `assets/css/main.scss`, so it wins over the gem's Sass
  * partials. It also wins over `assets/css/tailwind.css`: that file is entirely
@@ -196,7 +196,7 @@ th {
 }
 
 /* -----------------------------------------------------------------------------
- * Focus — PRODUCT.md accessibility: every interactive element gets a visible
+ * Focus: PRODUCT.md accessibility, every interactive element gets a visible
  * focus state, 2px pink outline. `:focus-visible` so a mouse click does not
  * light it up, only keyboard navigation.
  * -------------------------------------------------------------------------- */
@@ -208,7 +208,7 @@ th {
 }
 
 /* -----------------------------------------------------------------------------
- * Radius cap — DESIGN.md §4: never sharp corners, never above 12px except pills
+ * Radius cap, DESIGN.md §4: never sharp corners, never above 12px except pills
  * and circles. The gem's Tailwind component layer hardcodes 0.25rem/0.125rem on
  * `.card` and `.btn`; realign them with the token scale.
  * -------------------------------------------------------------------------- */
@@ -226,4 +226,109 @@ th {
 .rounded-sm,
 .rounded-lg {
   border-radius: var(--radius-md);
+}
+
+/* -----------------------------------------------------------------------------
+ * Table of contents sidebar
+ *
+ * `toc: sidebar` splits the container into the gem's `col-sm-3` and
+ * `col-sm-9`. A quarter of the page is far wider than a list of years or
+ * headings needs, so the nav takes a fixed column and the content takes the
+ * rest. `:has` picks the toc column without touching every other `.row`.
+ * -------------------------------------------------------------------------- */
+
+.container[role="main"] > .row > [class*="col-"]:has(#toc-sidebar) {
+  flex: 0 0 240px;
+  max-width: 28%; /* caps the fixed basis on a narrow window */
+}
+
+.container[role="main"] > .row:has(#toc-sidebar) > [class*="col-"]:not(:has(#toc-sidebar)) {
+  flex: 1 1 0;
+  max-width: none;
+  min-width: 0; /* flex items default to the content's intrinsic width */
+}
+
+#toc-sidebar {
+  font-family: var(--font-serif);
+}
+
+#toc-sidebar.toc > .toc-list {
+  padding-left: 0;
+}
+
+#toc-sidebar .toc-list li {
+  margin-bottom: 1px;
+}
+
+/* tocbot marks the active item with an absolutely positioned `::before` bar.
+   A left border on the link keeps the bar the height of one label, which is
+   what the previous site did. */
+#toc-sidebar .toc-link::before {
+  display: none;
+}
+
+#toc-sidebar .toc-link {
+  padding: 2px 0 2px 9px;
+  border-left: 1.5px solid transparent;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-text);
+
+  &:hover {
+    color: var(--color-accent);
+  }
+}
+
+#toc-sidebar .toc-link.is-active-link {
+  border-left-color: var(--color-accent);
+  color: var(--color-accent);
+  font-weight: var(--weight-medium);
+
+  &:hover {
+    color: var(--color-accent);
+  }
+}
+
+/* Narrow: the column is too thin to hold labels, and the gem's answer below
+   576px is to hide the nav while leaving its column standing, which goes on
+   squeezing the content. Give the row a second line and lay the nav along it.
+   `order`, because the nav column is second in the DOM under `sidebar: right`. */
+@media (max-width: 768px) {
+  .container[role="main"] > .row:has(#toc-sidebar) {
+    flex-wrap: wrap;
+  }
+
+  .container[role="main"] > .row > [class*="col-"]:has(#toc-sidebar) {
+    order: -1;
+    flex-basis: 100%;
+    max-width: none;
+  }
+
+  .container[role="main"] > .row:has(#toc-sidebar) > [class*="col-"]:not(:has(#toc-sidebar)) {
+    flex-basis: 100%;
+  }
+
+  #toc-sidebar {
+    position: static;
+    visibility: visible; /* the gem hides it below 576px */
+    height: auto;
+    margin-bottom: 20px;
+  }
+
+  #toc-sidebar .toc-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 16px;
+  }
+
+  #toc-sidebar .toc-list li {
+    margin-bottom: 0;
+  }
+
+  /* The left bar reads as a list marker; in a row it would just be clutter. */
+  #toc-sidebar .toc-link,
+  #toc-sidebar .toc-link.is-active-link {
+    padding-left: 0;
+    border-left: 0;
+  }
 }
