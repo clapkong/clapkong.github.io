@@ -46,6 +46,12 @@ Remaining gates:
 
 `Gemfile` pins every `al-*` gem to an exact released version in `group :al_folio_plugins`, and `_config.yml` lists the same gems under `plugins:`. Read the current pins from the `Gemfile` rather than trusting any version quoted in prose — including here. To test a gem fix against this site, repoint the `Gemfile` at a sibling checkout (`path:`, `git:`, or `branch:`) and `bundle install`; see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md#working-on-a-gem-alongside-the-starter). Revert the pin before committing.
 
+## Punctuation ban: em dash and middle dot
+
+**Never write an em dash (`—`) or a middle dot (`·`) in anything this repo ships or records**: site copy, page content, UI strings, SCSS/Liquid comments, commit messages, `.claude/*.md`, docs. Use a colon, a comma, parentheses, or two separate sentences instead of `—`; use a slash, a pipe, or a line break instead of `·`.
+
+User rule, stated 2026-09-21. It applies to new work; existing occurrences are cleaned up when the file is next touched for another reason, not in a sweep of their own.
+
 ## Session log — `.claude/BUILD_LOG.md`
 
 Ported from the `previous` repo. It exists to answer "what did the last session actually do, and why" without re-reading a diff. **It is committed** — `.gitignore` excludes `.claude/*` but un-ignores this one file, so it travels with the repo and reads the same from a fresh clone. `PLAN.md` and `PROGRESS.md` stay local. Being committed makes it public: keep it to reasoning about the work, not to anything you would not put in a commit message.
