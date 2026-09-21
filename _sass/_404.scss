@@ -1,14 +1,369 @@
 /*******************************************************************************
- * 404 page — DESIGN.md §8.9.
- *
- * Placeholder. Wired into `assets/css/main.scss` ahead of the work so that the
- * session doing this page does not touch the loader, which other sessions are
- * editing.
- *
- * Two things to settle before writing anything here:
- *   - §8.9 asks for Playfair Display at 120px. No webfont is loaded on this site
- *     (DESIGN.md §3 is Georgia + system sans + mono), so either add one for this
- *     page alone or fall back to Georgia.
- *   - `_pages/404.md` sets `redirect: true`, which bounces to the home page
- *     after three seconds. Nothing designed here is visible until that is off.
+ * 404 page (DESIGN.md §8.9). Markup: `_pages/404.md`.
  ******************************************************************************/
+
+/* Display face. §8.9 asks for Playfair Display 300; Georgia was chosen instead so
+   the site keeps loading no webfont. To switch: put the woff2 in `assets/fonts/`,
+   uncomment the @font-face, swap the `$display-font` line. */
+
+/*
+@font-face {
+  font-family: "Playfair Display";
+  src: url("/assets/fonts/playfair-display-300.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+*/
+
+$display-font: var(--font-serif);
+// $display-font: "Playfair Display", var(--font-serif);
+
+/* -----------------------------------------------------------------------------
+ * Page
+ * -------------------------------------------------------------------------- */
+
+/* `tailwind.css` declares `.mt-5{margin-top:3rem!important}`, and `!important` wins
+   from inside a layer, so the gem's 48px top margin cannot be cancelled without
+   matching it. It is left in place and counted in `$above-pad` below. */
+
+/* Pins the footer to the bottom. `body.sticky-bottom-footer` is meant to do this
+   site-wide but nothing styles that class, so short pages leave dead space under
+   the footer. Delete these three rules once the shell fixes it globally. */
+body:has(.page-404) {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+body:has(.page-404) > .container {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+body:has(.page-404) > footer {
+  flex: 0 0 auto;
+  /* The shell gives the footer a 64px top margin to lift it off the last
+     paragraph. Here the footer is already pinned to the bottom, so that margin is
+     only dead space, and it is what pushes the centre line off the middle of the
+     screen. */
+  margin-top: 0;
+}
+
+/* -----------------------------------------------------------------------------
+ * Vertical placement
+ *
+ * `.page-404__label` is the one fixed row between two halves that flex equally,
+ * so it lands on the page's centre line: the numeral above it, everything else
+ * below. The two knobs are here.
+ * -------------------------------------------------------------------------- */
+
+/* Gap between the label and the note. Matches the numeral's 12px gap above the
+   label, so the label sits in an even pair. */
+$label-gap: 12px;
+
+/* Gap from the centre line down to the card. The card stays put when this changes
+   only if the line stays put; raising it lifts the block above the line. 80px keeps
+   the card where it sat when the label was the anchor. */
+$below-offset: 40px;
+
+.page-404 {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  padding: 40px 30px;
+  text-align: center;
+}
+
+.page-404__above {
+  /* `min-height: 0` lets the two halves stay equal even when the lower one holds
+     more than its share. Without it the label drifts up. */
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.page-404__below {
+  flex: 1 1 0;
+  min-height: 0;
+  /* No padding here. `box-sizing: border-box` is global, so padding on a flex item
+     with `flex-basis: 0` still counts as base size and the two halves come out
+     uneven by half of it. The gap lives on `.page-404__note` instead. */
+}
+
+/* An `<h1>`, so the page has a heading to navigate by. Every value below is
+   restated because `_base.scss` styles `h1` for article bodies. */
+.page-404__code {
+  font-family: $display-font;
+  font-size: 120px;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -6px;
+  color: var(--color-accent);
+  margin: 0 0 12px;
+}
+
+.page-404__label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--color-meta);
+  margin: 0;
+}
+
+/* Last row of the upper half, so its bottom margin would lift the whole block off
+   the centre line. The gap under the line belongs to `.page-404__player`. */
+.page-404__note {
+  margin: $label-gap 0 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--color-meta);
+}
+
+/* -----------------------------------------------------------------------------
+ * Music card
+ * -------------------------------------------------------------------------- */
+
+.page-404__player {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  /* Wider than the content needs; `.page-404__meta` takes the slack and pushes the
+     wave to the far edge. */
+  min-width: 380px;
+  max-width: 100%;
+  padding: 14px 22px;
+  /* Margin, not padding on `.page-404__below`: padding on a flex item counts as
+     base size under `box-sizing: border-box` and would unbalance the halves. */
+  margin-top: $below-offset;
+  margin-bottom: 6px;
+  text-align: left;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.page-404__player[hidden] {
+  display: none;
+}
+
+.page-404__play {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  color: var(--color-surface);
+  cursor: pointer;
+  position: relative;
+  transition: opacity 0.2s ease;
+}
+
+.page-404__play:hover {
+  opacity: 0.85;
+}
+
+/* The visible circle stays 36px. This only widens what a finger can hit, to the
+   44px WCAG asks for. The card's 16px gap absorbs the 4px it reaches past the
+   button, so it never covers the track link. */
+.page-404__play::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
+
+/* One button, two icons. */
+.page-404__icon-pause,
+.page-404__player.is-playing .page-404__icon-play {
+  display: none;
+}
+
+.page-404__player.is-playing .page-404__icon-pause {
+  display: block;
+}
+
+.page-404__meta {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* The button plays in place; the title links out to the video. */
+.page-404__track {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.page-404__track:hover {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+
+.page-404__status {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.35;
+  color: var(--color-meta);
+}
+
+/* -----------------------------------------------------------------------------
+ * Wave bars. Motion only while playing.
+ * -------------------------------------------------------------------------- */
+
+.page-404__wave {
+  display: inline-flex;
+  align-items: flex-end;
+  flex: 0 0 auto;
+  gap: 3px;
+  height: 16px;
+}
+
+.page-404__wave i {
+  display: block;
+  width: 3px;
+  background: var(--color-accent);
+  border-radius: 1px;
+  transform-origin: bottom;
+}
+
+.page-404__wave i:nth-child(1) {
+  height: 7px;
+}
+.page-404__wave i:nth-child(2) {
+  height: 14px;
+}
+.page-404__wave i:nth-child(3) {
+  height: 10px;
+}
+.page-404__wave i:nth-child(4) {
+  height: 16px;
+}
+.page-404__wave i:nth-child(5) {
+  height: 6px;
+}
+
+@keyframes page-404-wave {
+  0%,
+  100% {
+    transform: scaleY(0.4);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+.page-404__player.is-playing .page-404__wave i {
+  animation: page-404-wave 0.9s ease-in-out infinite;
+}
+
+.page-404__player.is-playing .page-404__wave i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.page-404__player.is-playing .page-404__wave i:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.page-404__player.is-playing .page-404__wave i:nth-child(4) {
+  animation-delay: 0.45s;
+}
+.page-404__player.is-playing .page-404__wave i:nth-child(5) {
+  animation-delay: 0.6s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-404__player.is-playing .page-404__wave i {
+    animation: none;
+  }
+}
+
+/* Holds the injected iframe. Audio only, so it stays out of the layout. */
+.page-404__frame {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+/* -----------------------------------------------------------------------------
+ * Home link
+ * -------------------------------------------------------------------------- */
+
+/* Caption for the card: tight above, spaced below. */
+.page-404__credit {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.3px;
+  color: var(--color-meta);
+  opacity: 0.75;
+  margin: 0 0 36px;
+}
+
+.page-404__home {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.page-404__home:hover {
+  text-decoration: underline;
+}
+
+/* -----------------------------------------------------------------------------
+ * Narrow screens. The 120px numeral and the card's 380px both stop fitting.
+ * -------------------------------------------------------------------------- */
+
+/* The equal halves need room. On a short screen the lower one holds more than its
+   share and, because it is allowed to shrink, the overflow lands behind the footer:
+   at 320x568 the home link disappeared entirely. Below this height the split is
+   dropped and the block is simply centred. */
+@media (max-height: 620px) {
+  .page-404 {
+    justify-content: center;
+  }
+
+  .page-404__above,
+  .page-404__below {
+    flex: 0 0 auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-404 {
+    padding: 32px 20px;
+  }
+
+  .page-404__code {
+    font-size: 88px;
+    letter-spacing: -4px;
+  }
+
+  .page-404__credit {
+    margin-bottom: 30px;
+  }
+
+  .page-404__player {
+    min-width: 0;
+    gap: 12px;
+    padding: 12px 16px;
+  }
+}

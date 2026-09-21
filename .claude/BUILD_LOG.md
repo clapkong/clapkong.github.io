@@ -236,3 +236,260 @@ S1.4 일부도 해결. **`max_width`는 Sass가 아니라 `_config.yml` 키였�
 지우기 전에 `421e5a6`(Initial commit)의 전체 트리를 `../examples/al-folio-initial/`에 떴다. 선별하지 않은 것은 나중에 "그건 왜 안 가져왔지"를 없애려는 것. git 히스토리에 같은 내용이 있으므로 **엄밀히는 중복**이고, README에 복원 명령을 적어 지워도 무방함을 밝혔다.
 
 **미착수**: DESIGN.md §8.6의 페이지 레이아웃 — 연도 점프 사이드바, 논문별 흰 카드, 제목 28px/margin-bottom 36px, **부제 없음**. 사용자가 "제목 부분 공백이 많다"고 지적한 것이 이 규격과의 차이다. 측정해 보니 제목 35px·margin-bottom 17.5px에 부제가 남아 있고, 제목~첫 항목이 259px이다. 부제 제거 직전에 중단했다.
+
+---
+
+## [2026-09-21 13:34 KST] M2-S2.4: about 페이지 + 이메일 평문 차단
+
+**Status**: ✅ completed
+**Files**:
+
+- created: `_layouts/about.liquid` (override), `_includes/section-label.liquid`
+- modified: `_pages/about.md`, `_sass/_about.scss`, `.al-folio-overrides.yml`
+
+**Summary**: 데모 about(아인슈타인 사진, "Write your biography here...")을 DESIGN.md §8.3 hero + bio + skills로 교체하고, 그 아래 al-folio 구성(latest posts / selected publications / 소셜)은 사용자 결정으로 그대로 뒀다. news 섹션만 껐다: `_news/` 에 al-folio 데모 공지(2015~2016) 세 건뿐이라 없는 소식이 붙어 있었다. `_news/` 정리는 S0.4 소관이라 파일은 남기고 front matter 플래그만 내렸다.
+
+**이메일 평문 노출은 끝났다.** `grep -rl "clapkong@gmail.com" _site/` 가 1건에서 0건이 됐다. 원인은 PROGRESS 메모대로 서드파티 `jekyll-socials`의 `{% social_links %}`였다. 태그를 걷어내고 푸터와 같은 `.al-email-protect` + `data-eu`/`data-ed` 분할 패턴으로 직접 썼다. 나머지 5개(CV / GitHub / LinkedIn / Scholar / RSS)도 명시적으로 나열했다. 빌드 산출물에 남은 `mailto:`는 `al_email_protect` 플러그인이 넣는 퍼센트 인코딩 인라인 JS 한 줄뿐이고, 이건 보호 장치 자체다.
+
+**레이아웃은 gem 파일을 복사해 세 군데만 고쳤다** (S2.1의 교훈). ① 헤더 + float 프로필을 hero 블록으로, ② 섹션 h2에 `class="section-label"` 추가(텍스트와 링크는 그대로), ③ `{% social_links %}` 교체. `news.liquid` / `latest_posts.liquid` / `selected_papers.liquid` include는 손대지 않아 gem CSS/JS 계약이 그대로 남는다.
+
+**세 가지 판단.**
+
+① **아바타는 사진 없이 이니셜 원.** 사진이 아직 없는데, DESIGN.md §8.3이 애초에 아바타를 "110px 원, 배경 `--color-soft`"로 규정하고 있어서 빈 원 자체가 규격이다. 그 안에 Georgia 소문자 `s`를 넣었으니 자리표시자처럼 보이지 않는다. 사진이 생기면 front matter `hero.image` 한 줄로 바뀌고 CSS는 그대로다.
+
+② **크기를 한 단계씩 올렸다** (사용자 요청 "조금 더 큼직큼직하게"). 아바타 110 → 124px, intro 14 → 15px, bio 13 → 14px, skills 12 → 13px. 다만 타입 스케일은 안 건드렸다: 이름은 §8.3의 30px 대신 사이트 h1(35px)을 그대로 쓴다. 페이지마다 제목 크기가 달라지지 않게 하려는 것이고, 35px 자체가 S2.1에서 정한 중간값이다.
+
+③ **아래쪽 gem 섹션 제목도 이탤릭 라벨 + 구분선으로 통일**(사용자 선택). 한 페이지 안에서 bio/skills는 이탤릭 라벨, latest posts 같은 gem 섹션은 27px Georgia h2로 두 문법이 섞이는 게 문제였다. 마크업은 그대로 두고 클래스만 붙여 CSS로 해결했으므로 되돌리기 쉽다.
+
+`.section-label`은 about 전용이 아니라 사이트 컴포넌트다(DESIGN.md §3이 "이탤릭 라벨은 사이트의 서명"이라 하고 §8.5 / §8.7이 같은 걸 쓴다). 두 번째 페이지가 쓸 때 자기 파셜로 빼기로 하고 지금은 `_about.scss`에 뒀다.
+
+**페이지 좌우 패딩은 `:has(.about-hero)`로 스코프했다.** DESIGN.md §4는 단단 페이지에 80px을 주지만 사용자가 화면에서 보고 40px로 줄였다(본문 띠 1010px 대비 1090px). 컨테이너 1200px은 S1.4 결정대로 안 건드렸다. default 레이아웃이 페이지별 body 클래스를 안 붙여서 CSS만으로 이 페이지를 집을 방법이 이것뿐이었다. `:has()`를 모르는 브라우저는 컨테이너 패딩만 받는데, 그게 무난한 폴백이다. `_layouts/default.liquid`를 override하는 쪽이 더 정공법이지만 파일 하나를 통째로 떠안게 되므로 택하지 않았다.
+
+**CLAUDE.md 구두점 금지 규칙이 작업 도중에 추가됐다.** 새로 쓴 네 파일에 em dash와 중간점이 23군데 있어서 전부 고쳤다. 특히 skills 목록의 `Python (가운뎃점) PyTorch`는 `previous`에서 그대로 가져온 것이라 중간점이 12개 딸려 왔다. 슬래시로 바꿨다.
+
+**검증**: 빌드 5.4초, 평문 이메일 0건, prettier PASS, `upgrade audit` blocking 0, override 5건 중 about.liquid acknowledged, 통합 테스트 3종(new_plugins / plugin_toggles / css_minify) PASS. 데스크톱 1440px와 모바일 390px 스크린샷 확인.
+
+**남긴 것**: ① `_pages/about_einstein.md`도 `layout: about`이라 이제 hero를 타는데, front matter에 `hero:`가 없어서 빈 원 + 사이트 이름으로 렌더된다. 데모 페이지라 S0.4 / M4-S4.4에서 같이 정리한다. ② 연락처 줄의 CV 아이콘은 아직 al-folio 샘플 PDF를 가리킨다(M2-S2.7). ③ `assets/css/main.scss`가 `overrides audit`에서 `local_changed`인데 이 세션이 만진 게 아니다(404 스테이지 쪽 변경).
+
+---
+
+## [2026-09-21 13:36 KST] M2-S2.8 (404) — 404 페이지
+
+**Status**: ⚠️ partial: 404는 끝. 같은 스테이지의 archive(year/tag/category)는 미착수. YouTube 영상 id 하나가 비어 있다
+**Files**:
+
+- modified: `_pages/404.md`, `_sass/_404.scss`, `CLAUDE.md`
+
+**Summary**: DESIGN.md §8.9을 구현했다. `assets/css/main.scss`는 다른 세션이 쓰고 있어 건드리지 않았고, `_base.scss`도 손대지 않았다.
+
+**`layout: page` 대신 `layout: default`.** gem `page.liquid`가 `.post-header` 안에 `.post-title`(h1)과 `.post-description`을 찍는데, 이 페이지에서는 120px "404" 숫자가 곧 제목이라 그 둘이 그대로 중복이 된다. `.post-title`은 전역이고 지금 publications 세션이 크기를 다루는 중이라 CSS로 숨기는 것도 그쪽과 물린다. `default`로 내리면 `{{ content }}`가 `.container.mt-5` 바로 안에 들어와 마크업을 전부 우리가 쥔다. front matter의 `title`/`description`은 `<head>`와 크롤러용으로 남겼다.
+
+**`redirect: true` 제거.** `default.liquid:22-31`이 이 키를 보고 `<meta http-equiv="refresh" content="3; url=/">`를 찍는다. 3초 뒤 홈으로 튕기므로 여기서 만든 것이 사실상 안 보인다. 레이아웃 override 없이 front matter에서 키만 빼면 된다. 대신 `← home` 링크가 이동 수단이다. 검증: `grep -c 'http-equiv="refresh"' _site/404.html` = 0.
+
+**폰트는 Georgia로 보류.** §8.9은 Playfair Display 300 / 120px을 요구하지만 이 사이트는 웹폰트를 하나도 안 불러온다. `previous`를 확인해 보니 `_includes/head.html:24-28`에 `{% if page.layout == '404' %}` 조건부 Google Fonts 링크가 이미 있었으나, `_layouts/404.html`도 `_pages/404.md`도 없고 `assets/css/main.scss:64`의 `// @import "pages/404";`도 주석 상태다. 즉 **`previous`의 404는 목업(`mockups/404.png`)까지만 갔고 구현된 적이 없다.** 사용자가 직접 woff2를 받아 넣겠다고 해서, `_sass/_404.scss` 맨 위에 `@font-face` 블록을 주석으로 두고 `$display-font` 한 줄만 바꾸면 전환되게 했다. Georgia에는 300이 없어 400으로 렌더되므로 목업보다 굵다.
+
+**음악 플레이어는 넣되 자동재생은 뺐다.** 브라우저가 소리 있는 자동재생을 막기 때문에 "auto-started"라는 표시가 대부분의 방문에서 거짓이 된다. 부제를 `press play while you're lost`로 바꾸고, 재생을 누르면 `now playing`으로 교체한다.
+
+구현에서 YouTube IFrame API를 쓰지 않았다. **누르기 전에는 iframe 자체가 없다.** 클릭 시 `youtube-nocookie.com/embed/<id>?autoplay=1`을 주입하고, 정지하면 iframe을 제거한다. 클릭이 곧 사용자 제스처라 그 안에서는 autoplay가 허용된다. 얻는 것: 404 방문 한 건에 서드파티 스크립트 요청 0, 쿠키 0. 잃는 것: 정지 후 다시 재생하면 0초부터다. 404 페이지에서 감당할 만한 값이라고 봤다.
+
+검증은 headless chromium으로 했다. 재생 클릭 후 `is-playing` 클래스, `aria-pressed=true`, iframe 1개(`...nocookie.com/embed/...autoplay=1&rel=0`), pause 아이콘 표시, 웨이브 애니메이션 동작을 확인했고 정지 후 iframe 0개로 돌아간다. 콘솔 에러 0, 1280/390 양쪽에서 가로 스크롤 없음.
+
+**영상 id가 아직 비어 있다.** `data-yt-id="REPLACE_WITH_YOUTUBE_ID"`이고, 이 상태에서는 JS가 카드를 `hidden` 처리한다. 깨진 플레이어를 보이느니 없는 편이 낫다는 판단이다. id만 채우면 카드가 살아난다.
+
+**`.container:has(> .page-404) { margin-top: 0 }`** 한 줄이 필요했다. gem이 콘텐츠를 `.container.mt-5`로 감싸서 48px이 §8.9의 70px 위에 더 얹힌다. Tailwind의 `mt-5`가 `@layer` 안에 있어 unlayered 규칙이 `!important` 없이 이긴다(M1에서 확인한 성질).
+
+**발견: `sticky-bottom-footer`가 실제로는 동작하지 않는다.** body에 클래스는 붙는데 `min-height: 0px` / `display: block`이라 짧은 페이지에서 푸터 아래에 크림색 여백이 남는다. 1280x900에서 404는 599px, publications는 757px에서 문서가 끝난다. **이 세션이 만든 문제가 아니라 전역 현상**이고, 404가 사이트에서 가장 짧은 페이지라 제일 눈에 띌 뿐이다. `.page-404`에 `min-height`를 주는 국소 처방은 나중에 전역으로 고칠 때 충돌하므로 하지 않았다. 셸(S2.1) 소유 쪽에서 볼 문제다.
+
+**`overrides audit`에 `_sass/_404.scss`가 안 잡힌다** = gem에 동명 파일이 없다는 확인이다. 이번엔 `_footer.scss`/`_publications.scss` 때 밟은 함정을 피했다.
+
+**`CLAUDE.md`에 구두점 금지 규칙 추가.** 사용자가 em dash(`—`)와 중간점(`·`)을 절대 금지로 못박았다. 사이트 카피, 주석, 커밋 메시지, `.claude/*.md`까지 전부 해당한다. 기존 문서에 이미 박힌 것(`AGENTS.md`, 과거 로그 엔트리, 푸터의 `© 2026 · built with jekyll`)은 그 파일을 다른 이유로 만질 때 같이 정리하기로 하고 일괄 치환은 하지 않았다.
+
+**검증**: 빌드 성공, prettier PASS, `integration_css_minify.sh` PASS, `overrides audit` 5건 중 404 관련 0건.
+
+---
+
+## [2026-09-21 13:50 KST] M2-S2.8 (404) — 영상 id 확정
+
+**Status**: ✅ completed
+**Files**:
+
+- modified: `_pages/404.md`
+
+**Summary**: 사용자가 준 주소로 `data-yt-id`를 `3_l-UI4prVY`로 채웠다. 이제 카드가 보인다.
+
+**DESIGN.md의 아티스트 표기가 틀렸다.** YouTube oEmbed(`/oembed?url=...&format=json`)로 조회하니 `author_name`이 `KiiiKiii`(i가 세 개)다. §8.9과 목업은 `KiiKii`로 적고 있다. 실제 이름 쪽으로 맞췄다. 곡명 `404 (New Era)`는 그대로 맞다.
+
+**임베드 가능 여부를 실제로 확인했다.** 뮤직비디오는 레이블이 외부 임베드를 막는 경우가 있어 그냥 넘기면 안 되는 지점이다. 두 번 쟀는데 첫 번째가 틀렸다: `youtube-nocookie.com/embed/<id>`를 브라우저에서 **직접** 열면 `오류 153`이 난다. 이건 임베드 차단이 아니라 referrer/origin이 없어서 나는 것이라 판정에 쓸 수 없다. 실제 404 페이지 안에 띄워 프레임 내부를 읽으니 정상이었다: `duration 179.601`, `currentTime 7.03`, `paused false`, `video.error` 없음. 즉 임베드 허용이고 클릭 제스처 안에서 자동재생도 통과한다.
+
+`curl`로 embed 페이지를 받아 `playabilityStatus`를 찾는 방법은 쓸 수 없다. 147KB짜리 JS 셸만 오고 재생 정보가 인라인으로 들어 있지 않다.
+
+id 가드를 `videoId === "REPLACE_WITH_YOUTUBE_ID"`에서 `!videoId`로 단순화했다. 자리표시자 문자열은 역할이 끝났고, id가 비면 카드를 숨긴다는 동작만 남기면 된다.
+
+**검증**: 빌드 성공, prettier PASS, 1280/390 양쪽 콘솔 에러 0, 가로 스크롤 없음, 재생/정지 토글과 iframe 생성/제거 정상.
+
+---
+
+## [2026-09-21 13:56 KST] M2-S2.8 (404) — 사용자 피드백 반영
+
+**Status**: ✅ completed
+**Files**:
+
+- modified: `_pages/404.md`, `_sass/_404.scss`
+
+**Summary**: 실물을 보고 나온 지적 세 건을 반영했다.
+
+**① "여백이 너무 많다" = 앞 엔트리에서 전역 문제라고 넘긴 그 푸터 건이었다.** 판단이 틀렸다. 1280x900에서 푸터가 711px에서 끝나고 아래 189px이 빈 채로 남아 페이지가 잘린 것처럼 보인다. "전역이니 셸 쪽 일"이라는 게 사용자에게는 그냥 깨진 화면이다.
+
+404 페이지에서만 고쳤다. `<footer>`가 `<body>`의 직계 자식이라 `body:has(.page-404)`에 세로 flex를 주고 `.container`에 `flex: 1 0 auto` + `justify-content: center`를 주면 끝난다. body의 나머지 자식은 `<script>`(display:none), `#back-to-top`(position:fixed), 높이 0인 `<ninja-keys>`라 레이아웃에 끼지 않는다. 결과: 푸터 bottom 900px, 남는 공간 0.
+
+**전역으로 안 고친 이유는 그대로다.** `_base.scss`와 `assets/css/main.scss`를 다른 세션이 쓰고 있다. 셸(S2.1) 쪽에서 전역 처리가 들어오면 이 세 줄은 지우면 된다. 주석에 적어뒀다.
+
+설명이 두 번 안 통해서 세 번째는 **before/after 스크린샷을 만들어 띄웠다.** 고친 규칙을 `addStyleTag`로 되돌린 페이지와 현재 페이지를 같은 뷰포트로 찍어 나란히 열었다. 말로 두 번 실패한 걸 그림 한 장이 해결했다. 레이아웃 문제는 이 방식이 빠르다.
+
+**② 음원 무단 사용처럼 보인다.** 출처를 두 군데에 넣었다. 곡 제목을 `youtu.be/3_l-UI4prVY` 링크로 바꿨고(새 탭), 카드 아래 9px 모노로 `streamed from YouTube`를 뒀다. 역할이 갈린다: 버튼은 제자리 재생, 제목은 출처. 출처 문구만 확대에서 빼고 9px로 남겼다.
+
+**③ 카피.** 처음엔 설명을 세 문장으로 썼다가 "너무 verbose, chill한 개발자 느낌 선호"라는 지적을 받고 소문자 한 줄로 줄였는데, 사용자가 **원래 al-folio 기본 문구를 그대로 지정**했다: `Looks like there has been a mistake. Nothing exists here.` / `← please go back to the home page.` 즉 원하던 건 내 문장이 아니라 예전 문구였다. 리다이렉트 안내문에 있던 "please go back to the home page"를 home 링크 자리로 옮긴 셈이다.
+
+**크기 조정** (사용자 요청: 플레이어와 home을 키우고 아래로). 재생 버튼 32→42px, 아이콘 14→17px, 곡 제목 12→14px, 부제 9→10px, 웨이브 바 2x14→3x18px, home 12→14px. 설명문 아래 간격 40→72px로 벌려 플레이어 블록 전체를 내렸다. 카드 상하 패딩 12→16px, 좌우 18→24px.
+
+**검증**: 빌드 성공, prettier PASS, 1280/390 콘솔 에러 0, 가로 스크롤 없음, 재생/정지 토글 정상, 푸터 bottom = 뷰포트 높이. 390px에서 home 링크가 한 줄에 겨우 들어간다. 320px대에서는 두 줄로 접히며, 접히게 뒀다.
+
+---
+
+## [2026-09-21 14:05 KST] M2-S2.8 (404) — 마감 조정
+
+**Status**: ✅ completed
+**Files**:
+
+- modified: `_pages/404.md`, `_sass/_404.scss`
+
+**Summary**: 실물을 두 번 더 보고 나온 미세 조정. 앞 엔트리에서 키운 것을 일부 되돌렸다.
+
+**직전 라운드에서 두 가지를 과하게 했다.** ① 플레이어를 "아래로" 내리려고 설명문 아래 간격을 40→72px로 벌렸는데, 그게 설명문과 카드를 갈라놔 빈 띠로 보였다. 28px로 줄였다. 원하던 건 간격이 아니라 카드 자체의 존재감이었다. ② 카드를 42px 버튼까지 키웠더니 이번엔 커 보였다. 원래(32)와 키운 것(42)의 중간인 36px로, 곡 제목 14→13px, 패딩 16/24→14/22px, 웨이브 16→14px 높이로 되돌렸다.
+
+**"길이를 늘려"는 크기가 아니라 비율 문제였다.** `inline-flex`라 카드 폭이 내용에 딱 맞아 라벨처럼 보였다. `min-width: 380px` + `.page-404__meta`에 `flex: 1 1 auto`를 줘서 남는 폭을 제목 블록이 먹고 웨이브가 오른쪽 끝으로 밀리게 했다. 이제 띠로 읽힌다. 모바일에서는 380px가 390px 뷰포트를 넘으므로 `min-width: 0`으로 푼다.
+
+**`streamed from YouTube`를 캡션으로 만들었다.** 카드 아래 간격 14→6px, 그 아래 간격은 40px 유지. 위로 붙이고 아래로 떼는 것만으로 독립된 줄이 아니라 박스에 달린 주석으로 읽힌다.
+
+**home 링크 문구는 두 번 바뀌었다.** `← home` → `← please go back to the home page.`(옛 al-folio 문구 지정) → `← Home Page`. 앞 문장이 이미 상황을 설명하므로 링크까지 문장일 필요가 없다는 판단이다.
+
+**마지막으로 카드와 캡션을 한 덩어리로 묶었다.** 위 28px / 아래 40px로 어긋나 있어서 둘 다 36px(모바일 30px)로 맞췄다. 브라우저로 실측해 맞춘 값이다: 여백은 margin만이 아니라 line-height 여유까지 더해져 보이므로, 눈으로 맞추면 틀린다. 두 margin이 짝이라 한쪽만 바뀌면 깨지므로 양쪽 주석에 서로를 가리키게 적었다. 카드와 캡션 사이 6px은 그대로 뒀다.
+
+**검증**: 빌드 성공, prettier PASS, 1280/390 콘솔 에러 0, 가로 스크롤 없음. 카드 실측 380x66, 여백 36/6/36. 재생 시 iframe 1개/`now playing`, 정지 시 0개로 복귀.
+
+---
+
+## [2026-09-21 14:15 KST] M2-S2.8 — 스테이지 마감 + archive 이동
+
+**Status**: ✅ completed
+**Files**:
+
+- modified: `.claude/PROGRESS.md`
+
+**Summary**: 결정 두 건으로 S2.8을 닫았다.
+
+**폰트는 Georgia로 확정**(사용자 결정). DESIGN.md §8.9의 Playfair Display 300은 쓰지 않는다. 이로써 **웹폰트 0개**라는 사이트 전제가 유지된다. `_sass/_404.scss`의 `@font-face` 주석과 `$display-font` 한 줄은 그대로 둔다. 나중에 마음이 바뀌면 그 두 곳만 건드리면 되고, 지워두면 다음 사람이 처음부터 다시 조사한다.
+
+**archive는 S2.3a로 옮겨 블로그 묶음에 붙였다.** `/blog/2025/`, `/blog/tag/<t>/`, `/blog/category/<c>/`는 gem이 포스트를 훑어 자동 생성하는 페이지다. 즉 블로그 홈(S2.2)과 포스트(S2.3)에서 파생되므로 그 둘보다 먼저 손댈 이유가 없고, 지금 스타일을 잡아도 목록에 뜨는 건 전부 al-folio 데모 포스트다. S2.2/S2.3이 이미 "블로그는 마지막"으로 보류 상태라 같은 줄에 세웠다.
+
+남은 것은 이 스테이지 밖이다: 전역 `sticky-bottom-footer`(셸 S2.1), archive(S2.3a).
+
+---
+
+## [2026-09-21 14:29 KST] M2-S2.8 (404) — 세로 정렬을 라벨 기준으로
+
+**Status**: ✅ completed
+**Files**:
+
+- modified: `_pages/404.md`, `_sass/_404.scss`
+
+**Summary**: "PAGE NOT FOUND가 화면 정중앙에, 음원과 home은 절단선 아래에" 라는 요구. 덩어리 전체를 가운데 두던 것을 **라벨 한 줄을 기준점으로** 바꿨다.
+
+**구조**: `404`를 `.page-404__above`로, 나머지를 `.page-404__below`로 감싸고 라벨을 그 사이에 뒀다. 두 덩어리가 `flex: 1 1 0`으로 남는 공간을 똑같이 나눠 가지므로 사이에 낀 라벨의 중심이 자동으로 컨테이너 중심에 온다. 숫자를 박지 않아도 된다.
+
+**앞 라운드의 사실 오류를 정정한다.** 이전 엔트리에 "Tailwind가 전부 `@layer` 안이라 unlayered CSS가 `!important` 없이 이긴다"고 적었는데, `.container:has(> .page-404) { margin-top: 0 }`은 **한 번도 적용된 적이 없었다.** `tailwind.css`의 bootstrap-compat 층이 `@layer components` 안에서 `.mt-5{margin-top:3rem!important}`로 선언한다. `!important`는 레이어와 무관하게 normal 선언을 이긴다. 일반론은 맞지만 `!important` 유틸리티에는 틀렸다. 규칙을 지우고 48px을 그냥 계산에 포함시켰다.
+
+**두 덩어리가 반반이 아니었다.** `.page-404__below`에 `padding-top: 36px`을 줬는데 전역 `box-sizing: border-box` 때문에 **`flex-basis: 0`이어도 패딩만큼은 flex base size로 잡힌다.** free space가 그만큼 줄어 위 254 / 아래 290으로 갈렸고, 라벨이 18px 위로 밀렸다. 값이 정확히 절반(36/2)만큼 어긋난 것이 단서였다. 패딩을 flex 아이템에서 빼고 `.page-404__note`의 margin으로 옮겨 해결했다.
+
+**중심선이 화면 중앙과 어긋나는 원인은 푸터였다.** 컨테이너 위 공간(104px)보다 아래 공간(154.5px)이 크다. 차이의 대부분은 푸터의 `margin-top: 64px`이다. 이 페이지는 푸터를 이미 바닥에 고정했으므로 그 여백은 죽은 공간이라 404에서만 걷어냈다. 결과: 1280x900과 1280x700에서 라벨 중심이 정중앙 **아래 6.8px**. 보정용 매직넘버를 넣는 것보다 원인을 없애는 쪽이 화면 크기가 바뀌어도 버틴다.
+
+**모바일은 30px 위로 남는다.** 390px에서 푸터가 3줄로 접혀 151.5px이 되어 비대칭이 60px 남는다. 정확히 맞추려면 위쪽에 60px을 더 넣어야 하는데, 그러면 아래 덩어리가 푸터에 닿는다. 요구 조건(음원과 home이 절단선 아래)은 지켜지므로 여기서 멈췄다.
+
+**여백**: 사용자 지적대로 `404 → 라벨`과 `라벨 → 설명문`을 둘 다 12px로 맞췄다(`$below-offset`). 라벨이 대칭인 한 쌍 사이에 놓인다.
+
+**검증**: 빌드 성공, prettier PASS, 1280/390 콘솔 에러 0, 가로 스크롤 없음, 재생/정지 정상. 카드 위아래 여백 36/6/36 유지.
+
+---
+
+## [2026-09-21 14:32 KST] M2-S2.8 (404) — 기준선을 설명문 아래로
+
+**Status**: ✅ completed
+**Files**:
+
+- modified: `_pages/404.md`, `_sass/_404.scss`
+
+**Summary**: "`404` / `PAGE NOT FOUND` / `Looks like...` 이 부분만 위로, 아래는 그 자리 그대로." 앞 라운드에서 라벨을 기준점으로 삼았는데, 그러면 설명문이 아래 절반에 속해 같이 내려간다. 설명문을 위 덩어리로 옮겨 **기준선이 설명문과 음원 박스 사이**에 오게 했다.
+
+구조는 그대로다. 두 덩어리가 `flex: 1 1 0`으로 반씩 나눠 가지므로 경계가 화면 중앙에 온다. 달라진 건 무엇이 어느 덩어리에 속하느냐뿐이다.
+
+**"아래는 그대로"가 조건이라 오프셋을 역산했다.** 경계가 456.8px, 음원 박스가 있던 자리가 537px이므로 차이 80px을 박스의 `margin-top`으로 줬다. 이 값을 올리면 박스가 내려가는 게 아니라 **위 덩어리가 더 올라간다.** 아래 덩어리는 경계에서 고정 거리를 유지하기 때문이다. 결과: 설명문 바닥이 501 → 457로 44px 올라갔고 박스 537 / home 661은 그대로.
+
+`padding`이 아니라 `margin`으로 준 이유는 앞 엔트리와 같다. `box-sizing: border-box`에서 flex 아이템의 패딩은 base size로 잡혀 두 덩어리를 어긋나게 만든다.
+
+**모바일은 40px로 따로 뒀다.** 390x800에서 80px이면 아래 덩어리가 푸터를 파고든다.
+
+라벨은 이제 기준점이 아니므로 중앙에서 37.8px 위에 있다. 사용자가 요구한 것은 라벨 위치가 아니라 세 줄 묶음이 절단선 위에 있는 것이다.
+
+**검증**: 빌드 성공, prettier PASS, 1280/390 콘솔 에러 0, 가로 스크롤 없음, 재생/정지 정상. 간격 12/12, 설명문에서 박스까지 80, 박스에서 캡션 6, 캡션에서 home 36.
+
+---
+
+## [2026-09-21 14:47 KST] M2-S2.8 (404) — impeccable audit + 후속 수정
+
+**Status**: ✅ completed
+**Files**:
+
+- modified: `_pages/404.md`, `_sass/_404.scss`, `CLAUDE.md`
+
+**Summary**: 사용자가 **"페이지 완성을 confirm하면 무조건 impeccable을 한 번 돌린다"** 를 규칙으로 정했다. `CLAUDE.md` §"Run `impeccable` when a page is confirmed done"에 적었다. 그 첫 적용이 이번 404다.
+
+`impeccable audit`, register는 PRODUCT.md가 명시한 `brand`. **15/20, Good.** 성능 4/4, anti-pattern 4/4(AI 티 없음), 접근성 2/4, 반응형 2/4, 테마 3/4.
+
+**진짜 버그를 하나 잡았다.** 320x568(iPhone SE 급)에서 `← Home Page`가 **화면에서 사라진다.** 홈 링크 바닥이 푸터 상단을 52px 파고들어 뒤에 깔린다. 404에서 나가는 유일한 수단이 안 보이는 것이니 심각도가 높다. 원인은 내가 넣은 `min-height: 0`이다. 두 덩어리를 반반으로 유지하려고 내용보다 작게 줄어드는 걸 허용했는데, 짧은 화면에서는 아래 덩어리가 자기 몫을 넘겨 넘친 만큼 푸터 뒤로 간다. **1280x900만 보고 넘겼으면 못 잡았을 것이다.**
+
+고친 방식: `@media (max-height: 620px)`에서 반반 분할을 끄고 그냥 가운데 정렬한다. 임계값을 처음에 700px로 잡았다가 1280x700처럼 **안 깨지던 레이아웃까지 대체 방식으로 바뀌는 것**을 보고 620px로 내렸다. 9개 사이즈(320x568 ~ 1920x1080)에서 충돌 0, 가로 스크롤 0을 확인했다.
+
+**`<h1>`이 하나도 없었다.** `layout: page`를 버리면서 gem이 주던 `<h1 class="post-title">`이 사라졌는데 마크업을 새로 쓰며 전부 `<p>`로 찍었다. 변명의 여지가 없는 누락이다. `404`를 `<h1>`으로 바꿨다. `_base.scss`가 `h1`을 기사 본문용으로 스타일링하므로 `.page-404__code`가 모든 값을 다시 선언한다(클래스가 요소 선택자를 이긴다).
+
+**재생 버튼 터치 타깃을 보이는 크기를 안 바꾸고 넓혔다.** 36px 원은 그대로 두고 `::after`로 44x44 투명 영역을 겹쳤다. 카드의 16px gap이 버튼 밖으로 4px 나가는 것을 흡수해 곡 제목 링크를 덮지 않는다. `elementFromPoint`로 중심에서 22px 위 지점이 버튼으로 잡히는 것을 확인했다.
+
+**대비는 고치지 않기로 했다(사용자 결정).** 텍스트 8종 중 5종이 WCAG AA 미달인데 **그중 5건이 404의 문제가 아니라 팔레트의 문제다**: `--color-meta` `#8b7355`가 크림 위에서 4.23:1, `--color-accent` `#c99696`가 2.39:1. 둘 다 `_tokens.scss`에 있고 사이트 전역이 쓴다. PRODUCT.md는 "WCAG AA as baseline"이라 선언하지만 실제로는 본문(`#2d2d2d`, 12.99:1)만 지켜진다.
+
+`← Home Page`(2.39:1)에 대해 세 안을 렌더해 보여줬다: ⓐ 그대로 ⓑ accent와 text를 55:45로 섞어 4.86:1 ⓒ 글자는 본문색에 밑줄만 핑크로 12.99:1. **사용자가 ⓐ를 선택했다.** 404는 오래 머무는 페이지가 아니고, 바로 위에 같은 안내 문장이 있다. 404만 색을 바꾸면 사이트의 다른 핑크와 어긋나기도 한다. **`_tokens.scss`를 열 수 있을 때 사이트 전체로 다시 볼 사안으로 남긴다.**
+
+**죽은 코드 제거**: 사용자가 `$below-offset`을 80px에서 40px로 직접 낮춰서 미디어 쿼리의 모바일 전용 `margin-top: 40px`이 데스크톱 값과 같아졌다. 지웠다.
+
+**미해결로 남긴 것**(전부 P2/P3): 재생 아이콘 흰색 on accent 2.53:1(필요 3), 포커스 링 2.39:1(SC 1.4.11, 필요 3), `aria-pressed`와 `aria-label`을 둘 다 바꿔 이중 안내, 재생 상태 문구 교체가 `aria-live` 없이 조용함, 하드코딩 3건(`opacity: 0.75`, 웨이브 `border-radius: 1px`, 카드 `min-width: 380px`). 곡 제목 링크 18px은 **필수 동작이 아니라는 사용자 판단으로 그대로 둔다.**
+
+**검증**: 빌드 성공, prettier PASS, em dash/중간점 0건, 9개 뷰포트 충돌·가로 스크롤 0, `h1` 존재, 재생/정지 iframe 1개/0개, 간격 40/6/36 유지.
+
+---
+
+## [2026-09-21 14:57 KST] M2-S2.8 (404) — 잔여 감점 처리 결정
+
+**Status**: ✅ completed
+**Files**:
+
+- modified: `.claude/PROGRESS.md`
+
+**Summary**: audit의 남은 감점 4점을 **고치지 않기로 확정했다.** 점수를 채우는 것이 목적이 아니고, 셋 중 둘은 고치면 코드가 나빠진다.
+
+**하드코딩 3건은 전부 유지.** 감점 사유가 "값이 틀렸다"가 아니라 "`_tokens.scss`를 안 거쳤다"는 형식 문제인데, 세 값 모두 토큰화가 부적절하다.
+
+- `opacity: 0.75`(출처 문구): 빼면 대비가 2.76 → 4.23으로 오르지만 **사용자가 "잘 안 보여도 된다"고 판단했다.** 출처는 읽히라고 넣은 것이 아니라 밝히라고 넣은 것이고, 페이지에서 가장 조용해야 할 줄이다
+- 웨이브 막대 `border-radius: 1px`: 막대 폭이 3px인데 토큰의 최소 둥글기가 4px이다. 토큰을 쓰면 막대가 콩알로 뭉개진다. 1px은 의도한 헤어라인
+- 카드 `min-width: 380px`: 레이아웃 판단이지 색·간격 체계와 무관하다. 실측으로 근거를 남긴다. 데스크톱에서 이 값이 없으면 카드가 309px로 줄어 라벨처럼 보이고 웨이브가 제목에 붙는다. 380px이면 남는 71px을 제목 칸이 먹어 웨이브가 오른쪽 끝으로 밀리고 띠로 읽힌다. 폰에서는 차이가 0이다(390px에서 289px, 320px에서 250px). 미디어 쿼리가 `min-width: 0`으로 풀기 때문이고, 안 풀면 화면 밖으로 나간다
+
+**곡 제목 링크 터치 영역(18px)도 유지.** 재생은 버튼이, 출처는 제목이 맡아 역할이 갈려 있고 제목 링크는 필수 동작이 아니다. 필요해지면 재생 버튼에 쓴 `::after` 방식을 그대로 복사하면 된다.
+
+**최종 16/20.** 남은 감점은 접근성 2점(`_tokens.scss` 팔레트, 사이트 전역 사안), 반응형 1점(위 터치 영역), 테마 1점(위 하드코딩 3건). 셋 다 이유가 분명하고 여기에 적혀 있다.

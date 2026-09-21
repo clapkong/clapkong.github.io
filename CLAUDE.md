@@ -52,6 +52,12 @@ Remaining gates:
 
 User rule, stated 2026-09-21. It applies to new work; existing occurrences are cleaned up when the file is next touched for another reason, not in a sweep of their own.
 
+## Run `impeccable` when a page is confirmed done
+
+**When the user confirms a page is finished, invoke the `impeccable` skill once on that page before closing the stage.** Not on a draft, not mid-iteration: on the version the user has just signed off. Treat its findings as review notes, report them, and let the user decide what to act on.
+
+User rule, stated 2026-09-21. The point is a second pass by something that was not steering the design, at the one moment the page is stable enough for the pass to mean anything.
+
 ## Session log — `.claude/BUILD_LOG.md`
 
 Ported from the `previous` repo. It exists to answer "what did the last session actually do, and why" without re-reading a diff. **It is committed** — `.gitignore` excludes `.claude/*` but un-ignores this one file, so it travels with the repo and reads the same from a fresh clone. `PLAN.md` and `PROGRESS.md` stay local. Being committed makes it public: keep it to reasoning about the work, not to anything you would not put in a commit message.
