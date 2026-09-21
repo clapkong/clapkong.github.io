@@ -239,37 +239,44 @@ S1.4 일부도 해결. **`max_width`는 Sass가 아니라 `_config.yml` 키였�
 
 ---
 
-## [2026-09-21 13:34 KST] M2-S2.4: about 페이지 + 이메일 평문 차단
+## [2026-09-21 13:34 KST] M2-S2.4: about 페이지 + 이메일 보호
 
 **Status**: ✅ completed
 **Files**:
 
-- created: `_layouts/about.liquid` (override), `_includes/section-label.liquid`
-- modified: `_pages/about.md`, `_sass/_about.scss`, `.al-folio-overrides.yml`
+- created: `_layouts/about.liquid` (override), `_includes/section-label.liquid`, `_data/contact.yml`
+- moved: `.section-label` 규칙 `_sass/_about.scss` → `_sass/_section-label.scss`
+- modified: `_pages/about.md`, `_sass/_about.scss`, `_sass/_socials.scss`, `_includes/footer.liquid`, `_data/socials.yml`, `_config.yml`, `.al-folio-overrides.yml`
 
-**Summary**: 데모 about(아인슈타인 사진, "Write your biography here...")을 DESIGN.md §8.3 hero + bio + skills로 교체하고, 그 아래 al-folio 구성(latest posts / selected publications / 소셜)은 사용자 결정으로 그대로 뒀다. news 섹션만 껐다: `_news/` 에 al-folio 데모 공지(2015~2016) 세 건뿐이라 없는 소식이 붙어 있었다. `_news/` 정리는 S0.4 소관이라 파일은 남기고 front matter 플래그만 내렸다.
+**Summary**: 데모 about(아인슈타인 사진, "Write your biography here...")을 DESIGN.md §8.3 의 hero + bio + skills 로 교체했다. 그 아래 latest posts / selected publications / 소셜은 al-folio 구성 그대로 두고, news 섹션만 껐다: `_news/` 에 데모 공지(2015~2016) 세 건뿐이라 없는 소식이 붙어 있었다. `_news/` 파일 정리는 S0.4 소관이라 front matter 플래그만 내렸다.
 
-**이메일 평문 노출은 끝났다.** `grep -rl "clapkong@gmail.com" _site/` 가 1건에서 0건이 됐다. 원인은 PROGRESS 메모대로 서드파티 `jekyll-socials`의 `{% social_links %}`였다. 태그를 걷어내고 푸터와 같은 `.al-email-protect` + `data-eu`/`data-ed` 분할 패턴으로 직접 썼다. 나머지 5개(CV / GitHub / LinkedIn / Scholar / RSS)도 명시적으로 나열했다. 빌드 산출물에 남은 `mailto:`는 `al_email_protect` 플러그인이 넣는 퍼센트 인코딩 인라인 JS 한 줄뿐이고, 이건 보호 장치 자체다.
-
-**레이아웃은 gem 파일을 복사해 세 군데만 고쳤다** (S2.1의 교훈). ① 헤더 + float 프로필을 hero 블록으로, ② 섹션 h2에 `class="section-label"` 추가(텍스트와 링크는 그대로), ③ `{% social_links %}` 교체. `news.liquid` / `latest_posts.liquid` / `selected_papers.liquid` include는 손대지 않아 gem CSS/JS 계약이 그대로 남는다.
+**레이아웃은 gem 파일을 복사해 세 군데만 고쳤다** (S2.1 의 교훈). ① 헤더 + float 프로필을 hero 블록으로, ② 섹션 h2 에 `class="section-label"` 추가(텍스트와 링크는 그대로), ③ `{% social_links %}` 를 명시적 목록으로. `news.liquid` / `latest_posts.liquid` / `selected_papers.liquid` include 는 손대지 않아 gem CSS/JS 계약이 그대로 남는다.
 
 **세 가지 판단.**
 
-① **아바타는 사진 없이 이니셜 원.** 사진이 아직 없는데, DESIGN.md §8.3이 애초에 아바타를 "110px 원, 배경 `--color-soft`"로 규정하고 있어서 빈 원 자체가 규격이다. 그 안에 Georgia 소문자 `s`를 넣었으니 자리표시자처럼 보이지 않는다. 사진이 생기면 front matter `hero.image` 한 줄로 바뀌고 CSS는 그대로다.
+① **아바타는 사진 없이 이니셜 원.** 사진이 아직 없는데 DESIGN.md §8.3 이 애초에 아바타를 "110px 원, 배경 `--color-soft`" 로 규정해서 빈 원 자체가 규격이다. 그 안에 Georgia 소문자 `s` 를 넣었으니 자리표시자로 보이지 않는다. 사진이 생기면 front matter `hero.image` 한 줄로 바뀌고 CSS 는 그대로다.
 
-② **크기를 한 단계씩 올렸다** (사용자 요청 "조금 더 큼직큼직하게"). 아바타 110 → 124px, intro 14 → 15px, bio 13 → 14px, skills 12 → 13px. 다만 타입 스케일은 안 건드렸다: 이름은 §8.3의 30px 대신 사이트 h1(35px)을 그대로 쓴다. 페이지마다 제목 크기가 달라지지 않게 하려는 것이고, 35px 자체가 S2.1에서 정한 중간값이다.
+② **크기를 한 단계씩 올렸다** (사용자 요청 "조금 더 큼직큼직하게"). 아바타 110 → 124px, intro 14 → 15px, bio 13 → 14px, skills 12 → 13px. 타입 스케일은 안 건드렸다: 이름은 §8.3 의 30px 대신 사이트 h1(35px)을 쓴다. 페이지마다 제목 크기가 달라지지 않게 하려는 것이고, 35px 자체가 S2.1 에서 정한 중간값이다.
 
-③ **아래쪽 gem 섹션 제목도 이탤릭 라벨 + 구분선으로 통일**(사용자 선택). 한 페이지 안에서 bio/skills는 이탤릭 라벨, latest posts 같은 gem 섹션은 27px Georgia h2로 두 문법이 섞이는 게 문제였다. 마크업은 그대로 두고 클래스만 붙여 CSS로 해결했으므로 되돌리기 쉽다.
+③ **아래쪽 gem 섹션 제목도 이탤릭 라벨 + 구분선으로 통일**(사용자 선택). 한 페이지에서 bio/skills 는 이탤릭 라벨, latest posts 는 27px Georgia h2 로 두 문법이 섞이는 게 문제였다. 마크업은 그대로 두고 클래스만 붙여 CSS 로 해결했으므로 되돌리기 쉽다.
 
-`.section-label`은 about 전용이 아니라 사이트 컴포넌트다(DESIGN.md §3이 "이탤릭 라벨은 사이트의 서명"이라 하고 §8.5 / §8.7이 같은 걸 쓴다). 두 번째 페이지가 쓸 때 자기 파셜로 빼기로 하고 지금은 `_about.scss`에 뒀다.
+`.section-label` 은 about 전용이 아니라 사이트 컴포넌트다(DESIGN.md §3 이 "이탤릭 라벨은 사이트의 서명" 이라 하고 §8.5 / §8.7 이 같은 걸 쓴다). 처음에는 `_about.scss` 에 뒀는데, 그 사이 projects 세션이 같은 걸 쓰려고 빈 `_sass/_section-label.scss` 와 `@use` 줄을 만들고 "옮기는 사람이 소유한다" 고 적어둬서 이번에 옮겼다. main.scss 가 페이지 파셜보다 먼저 로드하므로 페이지가 자기 몫을 덮는 데 문제가 없다. `_includes/section-label.liquid` 는 그대로 공유한다.
 
-**페이지 좌우 패딩은 `:has(.about-hero)`로 스코프했다.** DESIGN.md §4는 단단 페이지에 80px을 주지만 사용자가 화면에서 보고 40px로 줄였다(본문 띠 1010px 대비 1090px). 컨테이너 1200px은 S1.4 결정대로 안 건드렸다. default 레이아웃이 페이지별 body 클래스를 안 붙여서 CSS만으로 이 페이지를 집을 방법이 이것뿐이었다. `:has()`를 모르는 브라우저는 컨테이너 패딩만 받는데, 그게 무난한 폴백이다. `_layouts/default.liquid`를 override하는 쪽이 더 정공법이지만 파일 하나를 통째로 떠안게 되므로 택하지 않았다.
+**페이지 좌우 패딩은 `:has(.about-hero)` 로 스코프했다.** DESIGN.md §4 는 단단 페이지에 80px 을 주지만 사용자가 화면에서 보고 40px 로 줄였다(본문 띠 1010px 대비 1090px). 컨테이너 1200px 은 S1.4 결정대로 안 건드렸다. default 레이아웃이 페이지별 body 클래스를 안 붙여서 CSS 만으로 이 페이지를 집을 방법이 `:has()` 뿐이었다. 모르는 브라우저는 컨테이너 패딩만 받는데 그게 무난한 폴백이다. `_layouts/default.liquid` override 가 정공법이지만 파일 하나를 통째로 떠안게 되므로 택하지 않았다. bio 문단은 640px, hero 소개는 520px 에서 끊는다(규격은 600/480).
 
-**CLAUDE.md 구두점 금지 규칙이 작업 도중에 추가됐다.** 새로 쓴 네 파일에 em dash와 중간점이 23군데 있어서 전부 고쳤다. 특히 skills 목록의 `Python (가운뎃점) PyTorch`는 `previous`에서 그대로 가져온 것이라 중간점이 12개 딸려 왔다. 슬래시로 바꿨다.
+**이메일: 만들고, 끄고, 다시 만들었다.** 처음에는 PROGRESS 메모대로 서드파티 `jekyll-socials` 의 `{% social_links %}` 를 걷어내고 플러그인의 `.al-email-protect` 분할 패턴을 써서 `grep -rl "clapkong@gmail.com" _site/` 를 1건에서 0건으로 만들었다. 그런데 동작을 본 사용자가 **메일 앱이 바로 열리는 편을 택했다.** 플러그인은 복사만 하므로 `protect_email` 을 `false` 로 내리고 보호는 직접 구현했다.
 
-**검증**: 빌드 5.4초, 평문 이메일 0건, prettier PASS, `upgrade audit` blocking 0, override 5건 중 about.liquid acknowledged, 통합 테스트 3종(new_plugins / plugin_toggles / css_minify) PASS. 데스크톱 1440px와 모바일 390px 스크린샷 확인.
+`.site-email` 링크가 주소를 `data-eu`/`data-ed` 두 속성으로 나눠 들고, 푸터의 스크립트가 클릭 시점에 합쳐 `location.href` 로 연다. `window.open` 이 아닌 이유는 `mailto:` 를 새 탭으로 열면 대부분의 브라우저가 빈 탭을 남기기 때문이다. 리스너는 document 에 위임해서 about 과 푸터 두 아이콘을 하나가 담당한다. JS 가 없으면 `<noscript>` 가 `clapkong [at] gmail [dot] com` 을 보여준다. 사용자는 "그냥 복사되도록" 을 제안했으나 **복사도 JS 가 필요해서** 폴백이 될 수 없다는 점을 알리고 이 형태로 정했다.
 
-**남긴 것**: ① `_pages/about_einstein.md`도 `layout: about`이라 이제 hero를 타는데, front matter에 `hero:`가 없어서 빈 원 + 사이트 이름으로 렌더된다. 데모 페이지라 S0.4 / M4-S4.4에서 같이 정리한다. ② 연락처 줄의 CV 아이콘은 아직 al-folio 샘플 PDF를 가리킨다(M2-S2.7). ③ `assets/css/main.scss`가 `overrides audit`에서 `local_changed`인데 이 세션이 만진 게 아니다(404 스테이지 쪽 변경).
+**주소를 `_data/socials.yml` 에서 `_data/contact.yml` 로 옮긴 것이 이 작업의 핵심이다.** 마크업만 고쳐서는 부족했다: ① `{% social_links %}`, ② `⌘K` 검색 팔레트가 각각 socials.yml 의 `email` 키를 읽어 `mailto:` 를 전 페이지에 박는다. 특히 팔레트는 al_search 가 **gem 안의 Liquid 템플릿**(`lib/templates/search-data.liquid.js`)을 Ruby 태그로 렌더하는 구조라 `_includes/` override 가 통하지 않는다. 데이터를 그 파일 밖으로 빼는 것이 유일한 차단 방법이었다. `metadata.liquid` 의 schema.org 이메일은 gem 이 이미 `{% comment %}` 로 막아뒀다.
+
+**CLAUDE.md 구두점 금지 규칙이 작업 도중에 추가됐다.** 새로 쓴 파일에 em dash 와 가운뎃점이 23군데 있어서 전부 고쳤다. 특히 skills 목록은 `previous` 에서 그대로 가져와 가운뎃점이 12개 딸려 왔다. 슬래시로 바꿨다.
+
+**검증**: 빌드 5.9초, `grep -rl "clapkong@gmail.com" _site/` 0건(테스트 스크립트 본문 제외), 팔레트 `social-email` 항목 0건, Playwright 로 클릭 시 조립 결과가 `mailto:clapkong@gmail.com` 이고 URL 에 `#` 이 안 붙는 것(preventDefault) 확인, 콘솔 에러 0건. 통합 테스트 4종(new_plugins / plugin_toggles / css_minify / comments) PASS, prettier PASS, `upgrade audit` blocking 0, override 6건 중 우리 것 5건 acknowledged(`_includes/scripts.liquid` 은 다른 세션 것). 데스크톱 1440px, 모바일 390px 스크린샷 확인.
+
+**한 번 헛다리**: `integration_new_plugins.sh` 가 `RTL demo post was not built` 로 실패했는데 원인은 다른 세션이 레포 루트에 만든 `check-tmp.cjs` 가 빌드 도중 사라진 것이었다(`Errno::ENOENT` in `static_file.rb`). 재실행하니 PASS. **레포 루트에 임시 파일을 만들면 동시에 도는 빌드를 죽인다.** 이 세션도 Playwright 스크립트를 루트에 두고 돌렸다: node 가 `node_modules` 를 찾아야 해서였는데 같은 사고를 낼 수 있는 방식이었다.
+
+**남긴 것**: ① `_pages/about_einstein.md` 도 `layout: about` 이라 이제 hero 를 타는데 front matter 에 `hero:` 가 없어서 빈 원 + 사이트 이름으로 렌더된다. 데모 페이지라 S0.4 / M4-S4.4 에서 같이 정리한다. ② 연락처 줄의 CV 아이콘은 아직 al-folio 샘플 PDF 를 가리킨다(M2-S2.7). ③ publications 는 아직 좌우 패딩이 없어 about 보다 80px 넓다. S2.5 에서 40px 으로 맞춰야 두 페이지가 같아진다.
 
 ---
 
@@ -602,3 +609,54 @@ optional `github:` 를 지원한다. 그래서 이번에는 `nav: false` 만 내
 - **제목 크기와 `.post-description`** 은 전역 page chrome 이라 M2 이후로 미뤘다(사용자 결정)
 - **카드 폭 1010px.** previous 는 760px 였다. 같은 전역 결정에 묶인다
 - **`max_author_limit: 3`** 이라 5인 논문이 "2 more authors" 로 접힌다. 미판단
+
+---
+
+## [2026-09-21 22:32 KST] 작업 중 배너 + 이메일 보호 방식 교체
+
+**Status**: ✅ completed
+**Files**:
+
+- created: `_sass/_wip-notice.scss`
+- modified: `_includes/header.liquid`, `_config.yml`, `assets/css/main.scss`, `.al-folio-overrides.yml`
+
+**Summary**: 데모 포스트와 샘플 CV가 아직 섞여 있으니 방문자에게 알리자는 요청. `_config.yml` 의 `wip_notice` 한 줄이 문구이고, 비우면 배너가 사라진다. 닫기 버튼은 두지 않기로 했다(사용자 선택).
+
+**헤더 위가 아니라 `</header>` 다음 문서 흐름에 넣었다.** navbar 가 `fixed-top` 이고 `progress-bar.js` 가 `#navbar` 를 재서 스크롤 진행바를 배치하기 때문에, 위에 띠를 하나 끼우면 navbar 오프셋, body 패딩, 그 측정값 셋을 손으로 맞춰야 하고 어긋나면 **조용히** 깨진다. S2.1 에서 이미 한 번 당한 자리다. 흐름에 두면 스크롤과 함께 올라가는 대신 그 위험이 없다. 측정으로 확인: navbar top 0 / 높이 56, 배너 top 56 / 높이 36, `#progress` top 56 으로 **변화 없음**.
+
+마크업은 `_includes/header.liquid`(이미 우리 override)에 넣어 `_layouts/default.liquid` 를 새로 떠안지 않았다. 색은 경고색이 아니라 blush 콜아웃 배경이다. 전 페이지에 반복되는 한 줄이고 경보가 아니라 고백이라서(PRODUCT.md "quiet, never silent").
+
+**이메일 보호를 다시 만들었다.** 앞 항목에서 `protect_email` 을 껐던 결정의 후속이다. 플러그인은 클릭 시 복사만 하는데 사용자는 메일 앱이 열리길 원했으므로, `.site-email` 링크가 주소를 `data-eu`/`data-ed` 로 쪼개 들고 푸터 스크립트가 클릭 시점에 합쳐 여는 방식으로 바꿨다. 자세한 내용과 `_data/contact.yml` 이동 근거는 앞 항목에 적었다.
+
+**레포가 PUBLIC 이라 소스에서도 뺐다.** 사용자가 `contact.yml` 에 평문으로 두는 게 괜찮냐고 물었고, 처음에는 "이미 git 히스토리 3개 커밋과 모든 커밋의 author 이메일에 있으니 데이터 파일을 옮겨도 소용없다" 고 설명만 하고 넘어갔다. 사용자가 다시 요구해서 반영했다: `_data/contact.yml` 을 `.gitignore` 에 넣고, `deploy.yml` 이 빌드 직전에 `SITE_EMAIL` secret 으로 그 파일을 쓴다. 로컬 체크아웃은 자기 사본을 두면 되고 `_data/contact.example.yml` 이 그 방법을 적어둔다. secret 이 없으면 경고만 남기고 이메일 아이콘이 빠진 채로 빌드된다(확인함).
+
+설명이 틀린 건 아니었지만 **결론이 틀렸다.** 히스토리에 남아 있다는 사실이 앞으로 소스에 계속 두어도 된다는 근거가 되지는 않는다. 커밋 author 이메일 쪽은 여전히 남아 있고, GitHub noreply 로 바꾸는 것이 다음 조치다(PROGRESS 에 미완료로 적음).
+
+---
+
+## [2026-09-21 22:37 KST] M2-S2.5: 연도 사이드바를 젬 tocbot 으로 교체
+
+**Status**: ⚠️ partial
+**Files**:
+
+- modified: `_pages/publications.md`, `_pages/cv.md`, `_pages/teaching.md`, `_sass/_base.scss`, `_sass/_publications-site.scss`, `assets/js/publications.js`
+
+**Summary**: "cv 는 어떻게 목차가 제목 옆에 있느냐" 는 질문에서 시작했다. 답은 front matter `toc: sidebar` 한 줄이고, 젬 `_layouts/default.liquid` 가 그 키를 보면 컨테이너를 `col-sm-3` + `col-sm-9` 로 쪼갠다. **제목이 `{{ content }}` 안에 들어 있어서** 목차와 제목의 윗변이 같은 줄에서 시작한다. 직접 만든 `.pub-years` 는 본문 안 그리드라 구조상 제목 아래일 수밖에 없었다. 그래서 자체 구현을 버리고 젬 쪽으로 갔다. 마크업, SCSS 60줄, JS `yearJumper()` 를 지웠다.
+
+**켜기만 해서는 사이드바가 빈 채로 뜬다.** 젬 `assets/js/common.js` 가 tocbot 을 돌리기 직전에 `.publications h2` 전부에 `data-toc-skip` 을 박는다. 일반적인 논문 목록에서는 연도 제목이 목차에 끼는 게 방해라서일 텐데, 이 페이지에서는 그게 정확히 목차의 내용이다. `common.js` 를 그림자로 뜨는 대신 우리 `publications.js` 가 (defer 순서상 뒤에 실행된다) 속성을 떼고 같은 옵션으로 tocbot 을 다시 init 한다. 젬 파일을 안 떠안는 쪽이 업그레이드에 유리하다.
+
+**해시 함정은 S2.5 에서 한 번 당한 그대로 재현됐다.** tocbot 링크를 누르면 `#year-2026` 이 붙고 `bibsearch.js` 의 `hashchange` 핸들러가 그걸 검색어로 읽어 목록이 0건이 된다(검색창에 `year-2026` 이 들어가는 것까지 측정). 사이드바에 **캡처 단계** 클릭 리스너를 달아 tocbot 핸들러보다 먼저 `preventDefault` + `stopPropagation` 하고 직접 스크롤한다.
+
+**왼쪽/오른쪽은 사용자가 오른쪽을 골랐다.** 나는 왼쪽을 권했다(연도가 쌓이면 레일이 구조로 읽힌다). 사용자 근거가 더 나았다: 오른쪽이면 publications 제목이 다른 페이지 제목들과 같은 세로선에 선다. cv 도 함께 오른쪽으로 옮겼다. 전환 비용은 front matter 한 단어다.
+
+**폭을 고정한 것이 반응형을 조용히 깼다.** `col-sm-3` 은 25%(1280px 에서 300px)라 연도 목록에 과했다. `:has(#toc-sidebar)` 로 그 칼럼만 집어 `flex: 0 0 240px` 를 줬는데, 이게 좁은 화면에서 `col-sm-*` 이 100% 로 풀려 위로 쌓이는 동작을 막았다. 젬은 576px 아래에서 nav 를 `visibility: hidden; height: 0` 으로만 숨기므로 **빈 칼럼이 240px 를 계속 먹었다.** 700px 창에서 본문이 460px 로 찌그러진 게 그것이다. 처음에는 칼럼을 `display: none` 으로 덮었는데 그건 증상만 가리는 것이었고(목차가 통째로 사라진다), 768px 아래에서 젬이 의도한 대로 목차를 제목 위 가로 배치로 되돌렸다. `order: -1` 이 필요한 이유는 `sidebar: right` 라 목차 칼럼이 DOM 상 본문 뒤이기 때문이다.
+
+목차 타이포는 `previous` 의 `_sass/pages/_publications.scss` 와 DESIGN.md §8.6 을 그대로 옮겼다. 한 군데 다르다: tocbot 은 활성 막대를 절대배치 `::before` 로 그리고 젬이 거기에 `!important` 로 색을 넣는다. `previous` 는 링크의 `border-left` 였고 그래야 막대가 글자 한 줄 높이로 떨어져서, `::before` 를 `display: none` 으로 끄고 보더로 다시 그렸다. `display` 에는 `!important` 가 없어서 통한다.
+
+검색칸은 젬 기본이 350px 에 거의 검정 1px 테두리와 드롭 섀도라 정작 그게 거르는 카드보다 세게 보였다. 240px, `0.5px solid var(--color-border)`, 섀도 제거, placeholder 는 `years` 라벨과 같은 Georgia 이탤릭으로 맞췄다. 위아래 여백 32/36 을 20/20 으로 줄였는데 **첫 연도 제목의 `margin-top: 2rem` 이 부모와 병합되어 되살아나서** `:first-child` 일 때만 0 으로 눌러야 했다.
+
+**검증**: 1440 / 1280 / 1024 / 900 / 800 / 700 / 600 / 480 / 375px 에서 가로 스크롤 없음, 콘솔 에러 0건, 목차 링크 클릭 후 `location.hash` 빈 문자열이고 항목 2건 유지, about 의 selected papers 영향 없음(제목 링크 포함), prettier PASS.
+
+**남긴 것**: 전역 페이지 크롬(제목 크기, `.post-description` 노출 여부), 카드 폭 1010px 대 `previous` 의 760px, `max_author_limit: 3`. 이번 작업에서 `.post-description` 아래 여백을 음수 마진으로 상쇄했는데, 크롬을 정리할 때 그 줄은 지워져야 한다.
+
+**BUILD_LOG 복구**: 이 항목을 쓰기 직전에 작업 트리의 로그가 **331줄 손실** 상태였다. 다른 세션이 S2.4 항목을 고쳐 쓰면서 그 아래 12개 항목(404 연작, secret, repositories, S2.5)을 통째로 날린 것이다. HEAD 사본에 그 세션의 S2.4 수정과 새 항목만 얹어 되살렸다. **append only 규칙이 이래서 있다**: 파일을 통으로 다시 쓰면 동시에 도는 세션의 기록이 조용히 사라진다.
