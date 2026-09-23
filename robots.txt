@@ -1,4 +1,33 @@
 User-agent: *
-Disallow:
+Disallow: /secret/
+
+# Crawlers that collect pages as AI training data. The only thing this site opts
+# out of. Search engines and the agents that fetch a page because a person just
+# asked about it are deliberately absent from this list: both are how readers and
+# recruiters find the site, and neither trains on what it reads.
+#
+# Google-Extended and Applebot-Extended are the training halves of Google and
+# Apple, split out from the crawlers that feed Search and Spotlight. Blocking them
+# does not affect search ranking.
+#
+# CCBot is Common Crawl, the open archive most public datasets are built from, so
+# it is the single line that covers the most models.
+#
+# This is a request, not a barrier. Well behaved crawlers honour it; scrapers
+# ignore it. Crawler names also change, so revisit this list once a year.
+User-agent: GPTBot
+User-agent: ClaudeBot
+User-agent: anthropic-ai
+User-agent: CCBot
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: Meta-ExternalAgent
+User-agent: Bytespider
+User-agent: Diffbot
+User-agent: omgilibot
+User-agent: Timpibot
+User-agent: cohere-ai
+User-agent: PanguBot
+Disallow: /
 
 Sitemap: https://clapkong.github.io/sitemap.xml
