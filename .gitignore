@@ -25,3 +25,6 @@ __pycache__/
 .claude/*
 !.claude/skills
 !.claude/BUILD_LOG.md
+
+# CI writes it from the SITE_EMAIL secret. See _data/contact.example.yml.
+_data/contact.yml

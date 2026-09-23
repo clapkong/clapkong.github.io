@@ -1,0 +1,2 @@
+# Copy to `_data/contact.yml` (gitignored). CI writes it from SITE_EMAIL.
+email: you@example.com

@@ -277,3 +277,40 @@
     </progress>
   {% endif %}
 </header>
+
+{%- if site.wip_notice -%}
+  <aside class="site-wip" id="site-wip" role="note">
+    <span>{{ site.wip_notice }}</span>
+  </aside>
+  <script>
+    (function () {
+      var el = document.getElementById('site-wip');
+      var KEY = 'site-wip-dismissed';
+      var text = el.textContent.trim();
+      var stored = null;
+      try {
+        stored = localStorage.getItem(KEY);
+      } catch (e) {}
+
+      // Storing the text, not a flag: editing the notice makes it show again.
+      if (stored === text) {
+        el.remove();
+        return;
+      }
+
+      // Added here so the button never appears without a handler behind it.
+      var close = document.createElement('button');
+      close.type = 'button';
+      close.className = 'site-wip__close';
+      close.setAttribute('aria-label', 'Dismiss this notice');
+      close.textContent = '\u00d7';
+      close.addEventListener('click', function () {
+        el.remove();
+        try {
+          localStorage.setItem(KEY, text);
+        } catch (e) {}
+      });
+      el.appendChild(close);
+    })();
+  </script>
+{%- endif -%}

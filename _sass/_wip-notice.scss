@@ -1,0 +1,32 @@
+/* Notice bar. Markup in `_includes/header.liquid`, text in `_config.yml`. */
+
+.site-wip {
+  position: relative;
+  background: var(--color-soft-bg);
+  color: var(--color-meta);
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+  padding: 9px 44px;
+}
+
+.site-wip__close {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-meta);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+
+  &:hover {
+    color: var(--color-accent);
+  }
+}

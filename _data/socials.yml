@@ -2,7 +2,7 @@
 # the socials will be displayed in the order they are defined here
 # for more information, please refer to the documentation of jekyll-socials plugin: https://github.com/george-gca/jekyll-socials
 cv_pdf: /assets/pdf/example_pdf.pdf # path to your CV PDF file
-email: clapkong@gmail.com
+# email: lives in `_data/contact.yml`. See AGENTS.md failure mode 6.
 github_username: clapkong # https://github.com/clapkong
 linkedin_username: clapkong # https://www.linkedin.com/in/clapkong
 # inspirehep_id: # 물리학 논문 DB. al-folio 데모값이라 껐다

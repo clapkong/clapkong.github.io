@@ -47,6 +47,7 @@
    partials above without needing specificity hacks. */
 @use "base";
 @use "site-header";
+@use "wip-notice";
 @use "site-footer";
 @use "socials";
 @use "about";

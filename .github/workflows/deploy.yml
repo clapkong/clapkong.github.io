@@ -91,6 +91,17 @@ jobs:
           valueFile: "_config.yml"
           propertyPath: "giscus.repo"
           value: ${{ github.repository }}
+      - name: Write contact address ✉️
+        # `_data/contact.yml` is gitignored so the address is not in this public
+        # repo. Without the secret the email icon is simply absent.
+        env:
+          SITE_EMAIL: ${{ secrets.SITE_EMAIL }}
+        run: |
+          if [ -n "$SITE_EMAIL" ]; then
+            printf 'email: %s\n' "$SITE_EMAIL" > _data/contact.yml
+          else
+            echo "::warning::SITE_EMAIL secret not set; building without a contact address"
+          fi
       - name: Install and Build 🔧
         run: |
           sudo apt-get update && sudo apt-get install -y imagemagick
