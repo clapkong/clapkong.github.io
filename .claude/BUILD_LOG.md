@@ -660,3 +660,50 @@ optional `github:` 를 지원한다. 그래서 이번에는 `nav: false` 만 내
 **남긴 것**: 전역 페이지 크롬(제목 크기, `.post-description` 노출 여부), 카드 폭 1010px 대 `previous` 의 760px, `max_author_limit: 3`. 이번 작업에서 `.post-description` 아래 여백을 음수 마진으로 상쇄했는데, 크롬을 정리할 때 그 줄은 지워져야 한다.
 
 **BUILD_LOG 복구**: 이 항목을 쓰기 직전에 작업 트리의 로그가 **331줄 손실** 상태였다. 다른 세션이 S2.4 항목을 고쳐 쓰면서 그 아래 12개 항목(404 연작, secret, repositories, S2.5)을 통째로 날린 것이다. HEAD 사본에 그 세션의 S2.4 수정과 새 항목만 얹어 되살렸다. **append only 규칙이 이래서 있다**: 파일을 통으로 다시 쓰면 동시에 도는 세션의 기록이 조용히 사라진다.
+
+---
+
+## [2026-09-23 18:23 KST] M2-S2.6: Notion HTML export 변환 스크립트
+
+**Status**: ⚠️ partial
+**Files**:
+
+- created: `bin/notion-to-project.py`
+- created: `_projects/protein-inverse-folding.md`, `assets/img/projects/protein-inverse-folding/` (로컬 전용, 아래 참고)
+- modified: `_projects/oxford-iiit-segmentation.md`, `.gitignore`
+
+**Summary**: Oxford 상세 페이지가 Notion 에서 가로로 놓인 이미지를 전부 세로로 쌓고 있었다. 원인은 레이아웃이 아니라 원본이다. Notion Markdown export 는 컬럼과 이미지 폭을 버리고, HTML export 는 `column-list` / `column` (`width:%`, `data-notion-column-ratio`) 과 `<img style="width:px">` 로 둘 다 남긴다. 그래서 입력을 HTML zip 으로 정했다. 그리드는 젬 `app.css` 의 `.row` / `.col-sm` 을 쓰는데 `col-sm-5` / `col-sm-7` 이 없어서, Notion 비율(1/16 단위)을 `col-sm` + `flex-grow` 정수비로 옮긴다(68.75:31.25 -> 11:5).
+
+**정규식으로 컬럼을 훑은 첫 시도가 틀렸다.** 컬럼의 닫는 태그를 안 봐서 컬럼 바로 뒤 블록(Oxford 의 IoU 표, Figure 13)까지 컬럼 안에 넣었다. 사용자가 PDF 와 다르다고 짚어서 알았다. 스크립트는 `html.parser` 로 작은 DOM 을 세워 중첩을 추적한다.
+
+**테스트에서 잡은 것**: Year 속성이 없으면 `date:` 가 빈 값으로 나가 **사이트 전체 빌드가 실패**한다(주석으로 대체). kramdown 은 하위 목록을 부모 글자 열(`1. ` 이면 3칸)에 맞춰야 중첩으로 읽는다. 컬럼은 HTML 블록이라 안의 Markdown 이 파싱되지 않으므로 컬럼 내용은 HTML 로 쓴다. 컬럼 안 문단을 `.caption` 으로 내보냈더니 작은 회색 가운데 정렬이 돼서 일반 `<p>` 로 바꿨다(사용자 지적). 실제 export 에서 새로 나온 블록은 `details.toggle`(새 토글 형식)과 클래스 없는 `figure > div.source`(임베드) 두 가지였다.
+
+**방향 전환: 본문은 스크립트 출력 그대로.** 처음에는 생성 뒤 내가 본문을 영어로 옮기고 다듬었는데, 사용자는 내용 수정을 Notion 에서 하려고 스크립트를 원한 것이었다. 손으로 고친 본문은 다음 export 때 덮어써지니 그 흐름을 깬다. 그래서 `--force` 재실행은 기존 front matter 만 보존하고 본문과 이미지(`NN.*`)를 갈아끼운다. 같은 export 로 두 번 돌려 결과가 동일한 것을 확인했다. Oxford 도 이 방식으로 재생성했고 영어판(도입부 2줄, alt 14개 포함)은 `.claude/backup/oxford-iiit-segmentation.en.md` 에 있다. 2026-09-21 의 "카피 영어 통일" 결정은 유지하되, 번역은 이제 Notion 쪽 작업이다.
+
+**Google Slides 임베드는 비공개 슬라이드면 로그인 화면이 뜬다.** Notion 에서 보였던 건 작성자 계정으로 로그인해 있어서다. 스크립트는 Slides / Docs / Sheets / YouTube 를 iframe 으로 바꾸고(CSP `frame-src https:` 허용) 공개 여부는 원본 공유 설정에 맡긴다.
+
+**검증**: Oxford 자동 변환 결과가 수작업 레이아웃과 1280px 스크린샷에서 일치, 이미지 14장 md5 일치. Notion 마크업을 흉내 낸 픽스처 12종(토글, 코드, 표, 수식, 체크리스트, 중첩 목록, 컬럼 안 목록 등) Jekyll 빌드 후 렌더 확인. 네 페이지(Oxford, Video, Korean, Protein) 본문이 스크립트 출력과 동일. prettier PASS.
+
+**남긴 것**: Video / Korean 은 테스트로 생성했다가 사용자 요청으로 본문과 이미지를 지우고 `has_detail: false` 로 되돌렸다. 프로젝트 `.md` 와 이미지는 git 변경이 많아 `.gitignore` 에 임시로 막아 두었다. **상세 페이지를 커밋하기 전에 그 블록을 지워야 한다**(PROGRESS S2.6). 상세 레이아웃(DESIGN.md §8.5) 은 다음 작업이다.
+
+---
+
+## [2026-09-23 18:25 KST] 첫 배포 push: 이메일 / 배너 / robots 만 골라서
+
+**Status**: ✅ completed
+**Files**:
+
+- modified: `.gitignore`, `.github/workflows/deploy.yml`, `_config.yml`, `_data/socials.yml`, `_includes/footer.liquid`, `_includes/header.liquid`, `_sass/_socials.scss`, `assets/css/main.scss`, `robots.txt`, `.claude/BUILD_LOG.md`
+- created: `_data/contact.example.yml`, `_sass/_wip-notice.scss`
+
+**Summary**: 작업 트리에 세 세션 분량의 미커밋 변경이 쌓여 있었고, 사용자가 **about 과 projects 디자인은 아직 기록에 남기고 싶지 않다** 고 해서 이메일 보호, 작업 중 배너, robots.txt 만 떼어 커밋하고 push 했다. `origin/main` `d8e6274..51d8a81`, 커밋 8개.
+
+**한 파일은 줄 단위로 쪼개야 했다.** `assets/css/main.scss` 에 `@use` 세 줄(`wip-notice`, `section-label`, `projects-site`)이 함께 들어와 있었는데, 뒤의 둘은 아직 미추적인 파셜을 가리킨다. 같이 올리면 **Sass 가 통째로 실패**한다. `git hash-object -w` 로 배너 줄만 넣은 사본을 만들어 `git update-index --cacheinfo` 로 인덱스에만 올렸다. 작업 트리는 건드리지 않았다.
+
+**"커밋 안 된 것 때문에 사이트가 깨지느냐" 는 질문에는 빌드로 답했다.** push 는 커밋만 보내므로 판단 기준은 HEAD 혼자 온전한지다. `git worktree` 로 HEAD 사본을 떠서 빌드했다(9.5초, 에러 없음). 산출물에서 평문 주소 0건, `.site-email` 분할 링크 존재, 배너와 `.site-wip` CSS 존재, publications 목차와 teaching 메뉴 제외 확인. `_data/contact.yml` 을 지우고 한 번 더 빌드해 **secret 이 없을 때도 경고만 내고 빌드가 성공**하는 것까지 봤다.
+
+**이메일 보호의 실제 효력을 다시 쟀다.** 막는 것은 HTML 을 정규식으로 긁는 수집기 하나다. 못 막는 것이 셋인데, 그중 둘이 이미 공개돼 있었다. ① 커밋 author 이메일이 14개 중 13개에 주소로 들어가 있다. ② 주소를 담은 과거 커밋 5개 중 **2개는 이미 `origin/main` 에 올라가 있었다**(`7484557`, `577f39f`). 그래서 히스토리 재작성은 "이미 유출된 것을 회수" 하지 못하면서 해시만 전부 바꾼다고 설명했고, 사용자가 지금 상태로 가기로 했다. ③ `.claude/BUILD_LOG.md` 는 커밋되는 파일인데 `grep` 명령 인용문에 주소가 세 번 있었다. 이건 `<내 주소>` 로 지우고 커밋했다(이미 작업 트리에서 누군가 고쳐둔 상태였고 나는 커밋만 했다).
+
+교훈 하나: **로그가 커밋된다는 사실은 로그를 쓸 때마다 다시 적용된다.** 검증 명령을 그대로 붙여넣으면 그 안의 값도 같이 공개된다.
+
+**남은 미커밋**: about 재디자인(`_pages/about.md`, `_sass/_about.scss`, `_layouts/about.liquid`, section-label 2종), projects 재디자인(`_pages/projects.md`, `_projects/` 11건, `_sass/_projects-site.scss`), 그 둘에 딸린 `main.scss` 의 `@use` 두 줄과 `.al-folio-overrides.yml` 의 about 해시, 그리고 `CLAUDE.md` 커밋 메시지 가이드와 `AGENTS.md` 의 침묵 실패 항목 추가. 앞의 둘은 사용자가 디자인이 마음에 들지 않아 보류한 것이다.
