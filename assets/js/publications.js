@@ -12,18 +12,20 @@
       var title = entry.querySelector(".title");
       if (!title || title.querySelector("a")) return;
 
-      // Falls back to the venue page so a title without a PDF still leads
-      // somewhere.
+      // The title goes to the paper's page, DOI first: it is the permanent one.
+      // The PDF keeps its own button unless it is all the entry has.
+      var doi = null;
+      var html = null;
       var pdf = null;
-      var fallback = null;
 
       entry.querySelectorAll(".links a[href]").forEach(function (link) {
         var label = link.textContent.trim().toLowerCase();
-        if (label === "pdf") pdf = link;
-        else if (!fallback && (label === "html" || label === "doi")) fallback = link;
+        if (label === "doi") doi = link;
+        else if (label === "html") html = link;
+        else if (label === "pdf") pdf = link;
       });
 
-      var target = pdf || fallback;
+      var target = doi || html || pdf;
       if (!target) return;
 
       var anchor = document.createElement("a");
@@ -34,7 +36,8 @@
       title.textContent = "";
       title.appendChild(anchor);
 
-      if (pdf) pdf.remove();
+      // The button the title just took would say the same thing twice.
+      target.remove();
     });
   }
 
