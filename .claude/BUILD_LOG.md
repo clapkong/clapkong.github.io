@@ -191,7 +191,7 @@ S1.4 일부도 해결. **`max_width`는 Sass가 아니라 `_config.yml` 키였�
 
 **버그 2건 수정.** ① `#back-to-top`(fixed, 우하단)이 800~1200px에서 푸터 아이콘 위에 앉아 클릭을 막았다(42px 겹침). 컨테이너가 1200px 중앙정렬이라 ~1344px 이상에선 여백이 알아서 비켜주지만 그 아래는 full-bleed라 충돌한다 → 769~1343px에만 `padding-right: 56px`. 전 구간 재측정해 최소 간격 14px 확보. **처음 측정은 틀렸었다** — `padding-right`가 요소 박스에 포함돼 bounding rect가 안 줄어서, 마지막 아이콘 중심점의 `elementFromPoint`로 다시 쟀다. ② 푸터 아이콘 재배열 중 블록을 잘라 붙이다 경계를 잘못 잡아 LinkedIn·RSS가 중복 출력됐다. 블록 전체를 다시 써서 해결.
 
-**이메일 보호**: `protect_email: true`. 푸터는 `.al-email-protect` + `data-eu`/`data-ed`로 주소를 쪼갠다 — `{% al_email_protect_link %}` 태그는 주소를 **텍스트**로 렌더해 아이콘을 밀어내므로 손으로 짰다. 플러그인 JS가 위임 방식이고 자식 노드를 안 건드리는 걸 소스에서 확인했다. `grep -rl "clapkong@gmail.com" _site/` = 0건이 목표인데 **현재 1건 남았다**: about 페이지의 `{% social_links %}`가 서드파티 `jekyll-socials`라 `protect_email`을 모르고 평문 `mailto:`를 찍는다. **빌드 시점 누출이라 JS로는 못 막는다.** 사용자 결정으로 M2-S2.4(about 재스킨)에서 함께 처리하고, `PROGRESS.md` S2.4에 재현·검증 명령까지 메모했다.
+**이메일 보호**: `protect_email: true`. 푸터는 `.al-email-protect` + `data-eu`/`data-ed`로 주소를 쪼갠다 — `{% al_email_protect_link %}` 태그는 주소를 **텍스트**로 렌더해 아이콘을 밀어내므로 손으로 짰다. 플러그인 JS가 위임 방식이고 자식 노드를 안 건드리는 걸 소스에서 확인했다. `grep -rl <내 주소> _site/` = 0건이 목표인데 **현재 1건 남았다**: about 페이지의 `{% social_links %}`가 서드파티 `jekyll-socials`라 `protect_email`을 모르고 평문 `mailto:`를 찍는다. **빌드 시점 누출이라 JS로는 못 막는다.** 사용자 결정으로 M2-S2.4(about 재스킨)에서 함께 처리하고, `PROGRESS.md` S2.4에 재현·검증 명령까지 메모했다.
 
 **`test/integration_new_plugins.sh` 수정.** `protect_email`을 켜자 "기본값은 off"를 전제한 단언이 깨졌다. 테스트가 검증하려던 건 게이팅이지 이 사이트의 취향이 아니므로, on/off **양쪽을 명시적 override로** 빌드하도록 바꿨다. 스타터 전제가 유저 사이트를 막은 두 번째 사례다(첫 번째는 S0.3의 `style_contract.js`).
 
@@ -264,7 +264,7 @@ S1.4 일부도 해결. **`max_width`는 Sass가 아니라 `_config.yml` 키였�
 
 **페이지 좌우 패딩은 `:has(.about-hero)` 로 스코프했다.** DESIGN.md §4 는 단단 페이지에 80px 을 주지만 사용자가 화면에서 보고 40px 로 줄였다(본문 띠 1010px 대비 1090px). 컨테이너 1200px 은 S1.4 결정대로 안 건드렸다. default 레이아웃이 페이지별 body 클래스를 안 붙여서 CSS 만으로 이 페이지를 집을 방법이 `:has()` 뿐이었다. 모르는 브라우저는 컨테이너 패딩만 받는데 그게 무난한 폴백이다. `_layouts/default.liquid` override 가 정공법이지만 파일 하나를 통째로 떠안게 되므로 택하지 않았다. bio 문단은 640px, hero 소개는 520px 에서 끊는다(규격은 600/480).
 
-**이메일: 만들고, 끄고, 다시 만들었다.** 처음에는 PROGRESS 메모대로 서드파티 `jekyll-socials` 의 `{% social_links %}` 를 걷어내고 플러그인의 `.al-email-protect` 분할 패턴을 써서 `grep -rl "clapkong@gmail.com" _site/` 를 1건에서 0건으로 만들었다. 그런데 동작을 본 사용자가 **메일 앱이 바로 열리는 편을 택했다.** 플러그인은 복사만 하므로 `protect_email` 을 `false` 로 내리고 보호는 직접 구현했다.
+**이메일: 만들고, 끄고, 다시 만들었다.** 처음에는 PROGRESS 메모대로 서드파티 `jekyll-socials` 의 `{% social_links %}` 를 걷어내고 플러그인의 `.al-email-protect` 분할 패턴을 써서 `grep -rl <내 주소> _site/` 를 1건에서 0건으로 만들었다. 그런데 동작을 본 사용자가 **메일 앱이 바로 열리는 편을 택했다.** 플러그인은 복사만 하므로 `protect_email` 을 `false` 로 내리고 보호는 직접 구현했다.
 
 `.site-email` 링크가 주소를 `data-eu`/`data-ed` 두 속성으로 나눠 들고, 푸터의 스크립트가 클릭 시점에 합쳐 `location.href` 로 연다. `window.open` 이 아닌 이유는 `mailto:` 를 새 탭으로 열면 대부분의 브라우저가 빈 탭을 남기기 때문이다. 리스너는 document 에 위임해서 about 과 푸터 두 아이콘을 하나가 담당한다. JS 가 없으면 `<noscript>` 가 `clapkong [at] gmail [dot] com` 을 보여준다. 사용자는 "그냥 복사되도록" 을 제안했으나 **복사도 JS 가 필요해서** 폴백이 될 수 없다는 점을 알리고 이 형태로 정했다.
 
@@ -272,7 +272,7 @@ S1.4 일부도 해결. **`max_width`는 Sass가 아니라 `_config.yml` 키였�
 
 **CLAUDE.md 구두점 금지 규칙이 작업 도중에 추가됐다.** 새로 쓴 파일에 em dash 와 가운뎃점이 23군데 있어서 전부 고쳤다. 특히 skills 목록은 `previous` 에서 그대로 가져와 가운뎃점이 12개 딸려 왔다. 슬래시로 바꿨다.
 
-**검증**: 빌드 5.9초, `grep -rl "clapkong@gmail.com" _site/` 0건(테스트 스크립트 본문 제외), 팔레트 `social-email` 항목 0건, Playwright 로 클릭 시 조립 결과가 `mailto:clapkong@gmail.com` 이고 URL 에 `#` 이 안 붙는 것(preventDefault) 확인, 콘솔 에러 0건. 통합 테스트 4종(new_plugins / plugin_toggles / css_minify / comments) PASS, prettier PASS, `upgrade audit` blocking 0, override 6건 중 우리 것 5건 acknowledged(`_includes/scripts.liquid` 은 다른 세션 것). 데스크톱 1440px, 모바일 390px 스크린샷 확인.
+**검증**: 빌드 5.9초, `grep -rl <내 주소> _site/` 0건(테스트 스크립트 본문 제외), 팔레트 `social-email` 항목 0건, Playwright 로 클릭 시 조립 결과가 `mailto:<내 주소>` 이고 URL 에 `#` 이 안 붙는 것(preventDefault) 확인, 콘솔 에러 0건. 통합 테스트 4종(new_plugins / plugin_toggles / css_minify / comments) PASS, prettier PASS, `upgrade audit` blocking 0, override 6건 중 우리 것 5건 acknowledged(`_includes/scripts.liquid` 은 다른 세션 것). 데스크톱 1440px, 모바일 390px 스크린샷 확인.
 
 **한 번 헛다리**: `integration_new_plugins.sh` 가 `RTL demo post was not built` 로 실패했는데 원인은 다른 세션이 레포 루트에 만든 `check-tmp.cjs` 가 빌드 도중 사라진 것이었다(`Errno::ENOENT` in `static_file.rb`). 재실행하니 PASS. **레포 루트에 임시 파일을 만들면 동시에 도는 빌드를 죽인다.** 이 세션도 Playwright 스크립트를 루트에 두고 돌렸다: node 가 `node_modules` 를 찾아야 해서였는데 같은 사고를 낼 수 있는 방식이었다.
 
