@@ -1,11 +1,18 @@
 ---
-layout: page
+layout: project
 title: project 8
+subtitle: "sample: comments enabled"
 description: an other project with a background image and giscus comments
-img: assets/img/9.jpg
-importance: 2
-category: work
+thumbnail: assets/img/9.jpg
+category: programming
+date: 2025-04-01
+period: 2024.06 - 2024.08
+role: intern
+status: completed
+tech_stack:
+  - Go
 giscus_comments: true
+has_detail: true
 ---
 
 Every project has a beautiful feature showcase page.

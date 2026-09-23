@@ -171,17 +171,12 @@ disqus_shortname: al-folio # put your disqus shortname
 # If you have blog posts published on medium.com or other external sources,
 # you can display them in your blog by adding a link to the RSS feed.
 # Optional: Set default categories and tags for posts from each source.
-external_sources:
-  - name: medium.com
-    rss_url: https://medium.com/@al-folio/feed
-    categories: [external-posts]
-    tags: [medium]
-  - name: Google Blog
-    posts:
-      - url: https://blog.google/technology/ai/google-gemini-update-flash-ai-assistant-io-2024/
-        published_date: 2024-05-14
-    categories: [external-posts]
-    tags: [google]
+# Example (see .claude/CONTENT_GUIDE.md):
+#   - name: velog
+#     rss_url: https://v2.velog.io/rss/<id>
+#     categories: [external-posts]
+#     tags: [velog]
+external_sources: []
 
 # -----------------------------------------------------------------------------
 # Newsletter
@@ -546,7 +541,8 @@ third_party_libraries:
     version: "5.5.0"
   google_fonts:
     url:
-      fonts: "https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons&display=swap"
+      # Was Roboto / Roboto Slab / Material Icons from Google Fonts; nothing uses them.
+      fonts: "/assets/css/no-google-fonts.css"
   highlightjs:
     integrity:
       css:

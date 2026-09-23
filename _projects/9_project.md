@@ -1,10 +1,13 @@
 ---
-layout: page
+layout: project
 title: project 9
+subtitle: "sample: minimal front matter"
 description: another project with an image 🎉
-img: assets/img/6.jpg
-importance: 4
-category: fun
+thumbnail: assets/img/6.jpg
+category: programming
+date: 2025-03-01
+status: completed
+has_detail: true
 ---
 
 Every project has a beautiful feature showcase page.

@@ -1,0 +1,102 @@
+---
+layout: default
+---
+{%- comment -%}
+  Project detail page. Starts as a copy of the gem's `page.liquid`; adds the
+  breadcrumb, the thumbnail (`_includes/project-thumb.liquid`), the subtitle,
+  tech stack pills, the category label, the period / role / team / status card, the description as an
+  intro, link buttons (`project-links.liquid`), a divider and the `project-paper` wrapper
+  (styles in `_sass/_projects-site.scss`). Only `has_detail: true` projects
+  reach it (`_plugins/project_detail_gate.rb`).
+{%- endcomment -%}
+{% if page._styles %}
+  <!-- Page/Post style -->
+  <style type="text/css">
+    {{ page._styles }}
+  </style>
+{% endif %}
+
+<div class="post project-detail">
+  <nav class="project-breadcrumb" aria-label="Breadcrumb">
+    <ol>
+      <li><a href="{{ '/' | relative_url }}">home</a></li>
+      <li><a href="{{ '/projects/' | relative_url }}">projects</a></li>
+      <li aria-current="page">{{ page.title }}</li>
+    </ol>
+  </nav>
+
+  {% include project-thumb.liquid project=page class='project-thumb--hero' %}
+
+  <header class="post-header project-header">
+    {%- if page.category %}
+      <p class="project-category">{{ page.category }}</p>
+    {%- endif %}
+    <h1 class="post-title">{{ page.title }}</h1>
+    {% if page.subtitle %}
+      <p class="project-subtitle">{{ page.subtitle }}</p>
+    {% endif %}
+
+    {%- if page.tech_stack %}
+      <ul class="project-tech" aria-label="tech stack">
+        {%- for tech in page.tech_stack %}
+          <li>{{ tech }}</li>
+        {%- endfor %}
+      </ul>
+    {%- endif %}
+
+    {%- if page.period or page.role or page.team or page.status %}
+      <dl class="project-meta">
+        {%- if page.period %}
+          <div>
+            <dt>period</dt>
+            <dd class="project-meta__mono">{{ page.period }}</dd>
+          </div>
+        {%- endif -%}
+        {%- if page.role %}
+          <div>
+            <dt>role</dt>
+            <dd>{{ page.role }}</dd>
+          </div>
+        {%- endif -%}
+        {%- if page.team %}
+          <div>
+            <dt>team</dt>
+            <dd>{{ page.team }}</dd>
+          </div>
+        {%- endif -%}
+        {%- if page.status %}
+          <div>
+            <dt>status</dt>
+            <dd>{{ page.status }}</dd>
+          </div>
+        {%- endif %}
+      </dl>
+    {%- endif -%}
+
+    {%- if page.description %}
+      <p class="project-intro">{{ page.description }}</p>
+    {%- endif %}
+
+    {% include project-links.liquid project=page style='button' %}
+  </header>
+
+  {%- assign body = content | strip -%}
+  {%- if body != '' %}
+    <hr class="project-divider">
+
+    <article class="project-paper">
+      {{ content }}
+    </article>
+  {%- endif %}
+
+  {% if page.related_publications %}
+    <h2>References</h2>
+    <div class="publications">
+      {% bibliography --cited_in_order %}
+    </div>
+  {% endif %}
+
+  {% if site.plugins contains 'al_comments' %}
+    {% include plugins/al_comments.liquid %}
+  {% endif %}
+</div>

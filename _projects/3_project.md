@@ -1,11 +1,14 @@
 ---
-layout: page
+layout: project
 title: project 3 with very long name
+subtitle: "sample: card redirects to an external site"
 description: a project that redirects to another website
-img: assets/img/7.jpg
+thumbnail: assets/img/7.jpg
+category: programming
+date: 2025-09-01
+status: completed
 redirect: https://www.wikipedia.org/
-importance: 3
-category: work
+has_detail: true
 ---
 
 Every project has a beautiful feature showcase page.

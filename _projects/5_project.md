@@ -1,10 +1,22 @@
 ---
-layout: page
+layout: project
 title: project 5
+subtitle: "sample: image thumbnail, demo and video"
 description: a project with a background image
-img: assets/img/1.jpg
-importance: 3
-category: fun
+thumbnail: assets/img/1.jpg
+category: programming
+date: 2025-07-01
+period: 2025.01 - 2025.02
+role: frontend
+team: 4 people
+status: completed
+tech_stack:
+  - React
+  - TypeScript
+demo: https://alshedivat.github.io/al-folio/
+links:
+  - { label: video, url: https://www.youtube.com/ }
+has_detail: true
 ---
 
 Every project has a beautiful feature showcase page.

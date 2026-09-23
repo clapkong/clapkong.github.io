@@ -707,3 +707,33 @@ optional `github:` 를 지원한다. 그래서 이번에는 `nav: false` 만 내
 교훈 하나: **로그가 커밋된다는 사실은 로그를 쓸 때마다 다시 적용된다.** 검증 명령을 그대로 붙여넣으면 그 안의 값도 같이 공개된다.
 
 **남은 미커밋**: about 재디자인(`_pages/about.md`, `_sass/_about.scss`, `_layouts/about.liquid`, section-label 2종), projects 재디자인(`_pages/projects.md`, `_projects/` 11건, `_sass/_projects-site.scss`), 그 둘에 딸린 `main.scss` 의 `@use` 두 줄과 `.al-folio-overrides.yml` 의 about 해시, 그리고 `CLAUDE.md` 커밋 메시지 가이드와 `AGENTS.md` 의 침묵 실패 항목 추가. 앞의 둘은 사용자가 디자인이 마음에 들지 않아 보류한 것이다.
+
+---
+
+## [2026-09-24 00:55 KST] M2-S2.6: 프로젝트 상세 레이아웃
+
+**Status**: ⚠️ partial <!-- 레이아웃 완료. 실제 프로젝트 콘텐츠 교체와 커밋이 남음 -->
+**Files**:
+
+- created: \_layouts/project.liquid, \_plugins/project_detail_gate.rb, \_includes/projects.liquid, \_includes/project-thumb.liquid, \_includes/project-links.liquid, \_includes/project-link.liquid
+- modified: \_sass/\_projects-site.scss, \_projects/[1-9]\_project.md, \_pages/projects.md (display_categories), \_config.yml (external_sources), bin/notion-to-project.py, .claude/CONTENT_GUIDE.md, .al-folio-overrides.yml, assets/css/main.scss
+  **Summary**: previous 의 DESIGN.md §8.5 를 출발점으로 상세 페이지를 새 레이아웃으로 분리했다. gem `page.liquid` 는 다른 페이지와 공유라 흰 paper 를 걸 곳이 없어서다. 헤더는 세 덩어리(라벨 + 제목 + 부제 + 태그 / 정보 카드 / 소개 + 버튼)로 묶고 덩어리 사이만 띄웠다. 정보 카드 위 26px 은 아래 20px 에 소개 문단의 줄간격이 더해져 보이는 간격과 맞춘 값이다. 본문 폭은 제한 없음(1070px 글자 폭), 860px, 960px 를 비교해 사용자가 960px 로 정했다. Notion 이미지 폭이 708px 기준이라 제한이 없으면 전체 폭 이미지가 두 배로 커진다.
+
+  사용자가 되돌린 것: accent 를 진하게 섞은 그라디언트(텁텁함), 팔레트 밖 진한 핑크 라벨, 초록/민트 그라디언트, 이미지 위 핑크 오버레이, 흰 글자 대신 어두운 글자의 github 버튼(previous 와 같게 흰 글자로 복귀, 대비 2.5:1 은 알고 둔 것), 임베드 둥근 모서리. 결론은 previous 팔레트의 핑크(`#f4c2c2 -> #fbeaf0`)와 보라(`#eeedfe -> #fbeaf0`) 두 개. 토큰 대신 hex 를 쓴 이유는 다크 모드가 `--color-soft-bg` 를 10% 틴트로 재정의해서 그라디언트 끝이 검게 변했기 때문이다.
+
+  카드 전체를 `<a>` 로 감싼 gem 구조에 아이콘 링크를 넣으면 중첩 앵커가 된다. 파서가 바깥 링크를 끊어서 카드 뒤쪽이 클릭되지 않는다. 제목 링크의 `::after` 를 카드 전체로 늘리고 아이콘 행을 z-index 로 올렸다. 게이트 플러그인은 숨긴 문서의 `permalink` 를 `/projects/` 로 바꾼다. al_search 팔레트가 gem 템플릿에서 모든 컬렉션 문서를 `item.url` 로 링크하므로 그대로 두면 404 다.
+
+  실제 프로젝트 `.md` 가 더미 데이터라 배포하면 거짓 정보가 된다. 그래서 al-folio 샘플 9건을 삭제하지 않고 템플릿 쇼케이스로 다시 썼다(모든 필드, 링크 종류, 표). 실제 것은 `.gitignore` 임시 블록 아래 두고 샘플만 배포한다. 로컬 빌드가 medium.com RSS 타임아웃으로 두 번 실패해서 al-folio 예제 `external_sources` 를 비웠다.
+
+  impeccable critique 27/40. 자동 검사기는 Roboto 로드(gem head 가 Google Fonts 로 불러오지만 사이트는 시스템 sans 와 Georgia 를 쓴다)와 oxford 의 12px 반복 간격(Notion 컬럼 유틸리티라 대부분 오탐)을 잡았다. 브라우저 오버레이 주입은 CSP `script-src 'self' 'unsafe-inline' https:` 가 `http://localhost` 스크립트를 막아 실패했다. 반영 여부는 사용자 결정으로 PROGRESS 에 남겼다. 커밋은 아직: 작업 트리의 about / section-label / `_pages/projects.md` 정렬 변경은 다른 세션 것이라 스테이징에서 뺐다.
+
+---
+
+## [2026-09-24 01:40 KST] M2-S2.6: impeccable 후속
+
+**Status**: ✅ completed
+**Files**:
+
+- created: assets/css/no-google-fonts.css
+- modified: \_config.yml (third_party_libraries.google_fonts), \_sass/\_projects-site.scss
+  **Summary**: critique 다섯 항목 중 둘만 반영했다. 본문 줄 길이는 70ch / 85ch / 90ch 비교 캡처를 보고 사용자가 90ch 로 정했다. 문단, 목록, 토글에만 걸고 이미지, 컬럼, 표는 종이 폭 그대로다. 한글이 섞이면 `ch` 가 영문 폭 기준이라 한 줄 한글 수는 더 적다. Google Fonts 는 gem `head.liquid` 가 조건 없이 `<link>` 를 넣어서 URL 을 비우면 `href=""` 로 현재 페이지를 CSS 로 다시 받는다. CSP `style-src` 가 `data:` 를 막아서 빈 로컬 CSS 를 가리키게 했다. head 를 shadow 하는 것보다 gem 업데이트에 안전하다. 끄기 전에 빌드 결과를 뒤졌다: Roboto 는 Tailwind body 기본값뿐(`_base.scss` 가 덮음), al_search 팔레트는 Material Icons 대신 SVG 아이콘, distill 은 시스템 폰트 스택 안의 이름일 뿐. 이득은 렌더를 막는 외부 CSS 요청 하나라 작다. 그라디언트, accent 대비, Slides 임베드는 사용자가 유지로 결정. 카드 아이콘 크기 지적은 상세 페이지 범위 밖이라 뺐다.

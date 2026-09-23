@@ -1,10 +1,17 @@
 ---
-layout: page
+layout: project
 title: project 6
-description: a project with no image
-img:
-importance: 4
-category: fun
+subtitle: "sample: short period, team only"
+description: a project with a short info card
+thumbnail: assets/img/5.jpg
+category: research
+date: 2025-06-01
+period: 2024.12
+team: solo
+status: completed
+tech_stack:
+  - Python
+has_detail: true
 ---
 
 Every project has a beautiful feature showcase page.

@@ -1,0 +1,16 @@
+{%- comment -%}
+  A project's links: `github`, `demo`, then each `links:` entry as written
+  (`- { label: paper, url: ... }`). The detail page renders them as buttons,
+  the index card as an icon row.
+  include.project, include.style (`button` or `icon`)
+{%- endcomment -%}
+{%- assign p = include.project -%}
+{%- if p.github or p.demo or p.links -%}
+  <div class="{% if include.style == 'icon' %}project-card-links{% else %}project-cta{% endif %}">
+    {%- if p.github %}{% include project-link.liquid label='github' url=p.github style=include.style %}{% endif -%}
+    {%- if p.demo %}{% include project-link.liquid label='demo' url=p.demo style=include.style %}{% endif -%}
+    {%- for link in p.links -%}
+      {%- include project-link.liquid label=link.label url=link.url style=include.style -%}
+    {%- endfor -%}
+  </div>
+{%- endif -%}

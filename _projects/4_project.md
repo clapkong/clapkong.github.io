@@ -1,10 +1,20 @@
 ---
-layout: page
+layout: project
 title: project 4
-description: another without an image
-img:
-importance: 3
-category: fun
+subtitle: "sample: image thumbnail and a Markdown table"
+description: a project with a table in the body
+thumbnail: assets/img/11.jpg
+category: programming
+date: 2025-08-01
+period: 2025.05 - 2025.07
+role: backend
+team: solo
+status: completed
+tech_stack:
+  - FastAPI
+  - PostgreSQL
+github: https://github.com/alshedivat/al-folio
+has_detail: true
 ---
 
 Every project has a beautiful feature showcase page.
@@ -78,3 +88,13 @@ Here's the code for the last row of images above:
 ```
 
 {% endraw %}
+
+### A table
+
+A Notion table block comes out of `bin/notion-to-project.py` as a Markdown table like this one.
+
+| Model       | mIoU   | Dice   | Pixel acc. |
+| ----------- | ------ | ------ | ---------- |
+| U-Net       | 0.7368 | 0.8432 | 0.9260     |
+| Autoencoder | 0.5025 | 0.6445 | 0.8173     |
+| CLIP        | 0.9234 | 0.9601 | 0.9970     |

@@ -1,0 +1,27 @@
+{%- comment -%}
+  LOCAL OVERRIDE. Changed from the gem: the card links to the detail page only
+  when `has_detail: true`, through the title stretched over the card so the
+  icon links are not nested inside it (see `_plugins/project_detail_gate.rb`), and the
+  thumbnail is `project-thumb.liquid` (gradient when there is no image), and
+  the github icon became every link as an icon row (`project-links.liquid`).
+{%- endcomment -%}
+{%- assign linked = false -%}
+{%- if project.redirect or project.has_detail == true -%}{%- assign linked = true -%}{%- endif -%}
+<div class="col">
+  <div class="card h-100 project-card{% if linked %} hoverable{% endif %}">
+    {% include project-thumb.liquid project=project class='project-thumb--card' %}
+    <div class="card-body">
+      <h2 class="card-title">
+        {%- if linked -%}
+          <a class="project-card__main" href="{% if project.redirect %}{{ project.redirect }}{% else %}{{ project.url | relative_url }}{% endif %}">
+            {{- project.title -}}
+          </a>
+        {%- else -%}
+          {{ project.title }}
+        {%- endif -%}
+      </h2>
+      <p class="card-text">{{ project.description }}</p>
+      {% include project-links.liquid project=project style='icon' %}
+    </div>
+  </div>
+</div>

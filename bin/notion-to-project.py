@@ -473,16 +473,19 @@ def front_matter(root, conv):
 
     lines = [
         "---",
-        "layout: page",
+        "layout: project",
         f"title: {q(title)}",
         "subtitle:",
         f"description: {q(desc)}".rstrip(),
-        f"img: {first_img}",
+        "img:",
+        # gradient-1 (blush), gradient-2 (lavender), or an image path
+        f"thumbnail: gradient-1  # e.g. {first_img}" if first_img else "thumbnail: gradient-1",
         "category:",
         # an empty `date:` fails the whole build
         f"date: {year[:4]}-01-01" if year else "# date: YYYY-MM-DD (no Year property in Notion)",
         "period:",
         "role:",
+        "team:",
         "status: completed",
         "tech_stack: []",
         "github:",

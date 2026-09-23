@@ -1,11 +1,23 @@
 ---
-layout: page
+layout: project
 title: project 7
+subtitle: "sample: related publications"
 description: with background image
-img: assets/img/4.jpg
-importance: 1
-category: work
+thumbnail: assets/img/4.jpg
+category: research
+date: 2025-05-01
+period: 2024.09 - 2024.12
+role: data pipeline
+team: 5 people
+status: completed
+tech_stack:
+  - PyTorch
+  - CLIP
+links:
+  - { label: huggingface, url: https://huggingface.co/ }
+  - { label: dataset, url: https://www.kaggle.com/datasets }
 related_publications: true
+has_detail: true
 ---
 
 Every project has a beautiful feature showcase page.

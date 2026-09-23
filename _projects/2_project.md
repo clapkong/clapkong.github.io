@@ -1,11 +1,22 @@
 ---
-layout: page
+layout: project
 title: project 2
+subtitle: "sample: comments enabled"
 description: a project with a background image and giscus comments
-img: assets/img/3.jpg
-importance: 2
-category: work
+thumbnail: assets/img/3.jpg
+category: research
+date: 2025-10-01
+period: 2025.03 - 2025.06
+role: model training
+team: 2 people
+status: completed
+tech_stack:
+  - JAX
+github: https://github.com/alshedivat/al-folio
+links:
+  - { label: paper, url: https://arxiv.org/ }
 giscus_comments: true
+has_detail: true
 ---
 
 Every project has a beautiful feature showcase page.

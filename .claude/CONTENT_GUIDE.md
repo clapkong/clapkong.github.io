@@ -38,6 +38,7 @@ categories: category
 
 - 이미지는 `assets/img/posts/<글 이름>/` 에 모아 두고 `{% include figure.liquid path="assets/img/posts/<글 이름>/01.png" class="img-fluid" zoomable=true alt="설명" %}` 로 넣는 것을 권한다(프로젝트와 같은 방식)
 - 이미지를 가로로 나란히 두려면 `<div class="row">` + `<div class="col-sm">` 로 감싼다. 예시는 `_posts/2015-05-15-images.md`
+- 다른 곳(velog, medium 등)에 쓴 글을 `/blog/` 목록에 같이 보이려면 `_config.yml` 의 `external_sources` 에 그 블로그의 RSS 주소를 넣는다. 빌드할 때마다 가져오고, 목록에서 누르면 원래 글로 이동한다. 지금은 비어 있다
 - 지금 `_posts/` 의 글은 al-folio 예제다. 수식, 이미지 갤러리, 코드, 표, 탭 등 **문법이 필요할 때 참고용**으로 둔다. 블로그 목록 페이지(`/blog/`)도 아직 al-folio 기본 디자인이다
 
 ## publications
@@ -76,17 +77,27 @@ categories: category
 
 ```yaml
 ---
-layout: page
+layout: project
 title: Oxford-IIIT Pet Segmentation
 description: 카드에 보이는 한두 문장
-img: assets/img/projects/oxford-iiit-segmentation/01.png # 카드 이미지. 비워도 된다
+thumbnail: gradient-1 # 카드와 상세 헤더. gradient-1(핑크), gradient-2(보라), 또는 이미지 경로
 category: research # _pages/projects.md 의 display_categories 중 하나
 date: 2025-04-01 # 정렬 기준. 빈 값으로 두면 빌드가 실패한다
 github: https://github.com/... # 있으면 카드에 아이콘
 ---
 ```
 
-`subtitle`, `period`, `role`, `status`, `tech_stack`, `thumbnail`, `has_detail` 도 적어 두지만, **지금은 화면에 나오지 않는다.** 프로젝트 상세 레이아웃 작업(PROGRESS S2.6)에서 쓰일 자리다.
+상세 페이지용 필드:
+
+- `has_detail: true`: 이게 있어야 상세 페이지가 생기고 카드가 링크된다. 없거나 `false` 면 카드만 보인다
+- `subtitle`: 제목 아래 한 줄
+- `description`: 카드 문구이자, 상세 페이지에서 흰 본문 위에 나오는 소개 문단
+- `period`, `role`, `team`, `status`: 태그 아래 정보 카드. `role` 은 맡은 부분을 짧게(`co-first author`, `U-Net & CLIP models`), `team` 은 인원(`2 people`, `solo`). 비운 칸은 안 나온다
+- `category`: 제목 위 작은 라벨로도 나온다
+- `tech_stack`: 태그 목록
+- `github`, `demo`, `links`: 상세 페이지의 버튼이자 카드의 아이콘. 그 밖의 링크는 `links:` 에 `- { label: paper, url: https://... }` 식으로 넣는다. github, demo 다음에 `links:` 에 적은 순서대로 나온다. label 이 `paper`, `slides`, `report`, `video`, `poster`, `blog`, `huggingface`, `dataset`, `file` 이면 맞는 아이콘이 붙고, 나머지는 링크 아이콘 (목록은 `_includes/project-link.liquid`)
+
+`thumbnail` 을 비우면 `img`, 그것도 없으면 `gradient-1` 이 나온다. 카테고리는 `research`, `programming` 두 가지(`_pages/projects.md` 의 `display_categories`).
 
 ### 상세 페이지: Notion 에서 쓰고 변환
 

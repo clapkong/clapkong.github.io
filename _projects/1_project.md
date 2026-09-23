@@ -1,11 +1,28 @@
 ---
-layout: page
+layout: project
 title: project 1
+subtitle: "sample: image thumbnail, all link types"
 description: with background image
-img: assets/img/12.jpg
-importance: 1
-category: work
+thumbnail: assets/img/12.jpg
+category: research
+date: 2026-01-01
+period: 2025.09 - 2025.12
+role: first author
+team: 3 people
+status: completed
+tech_stack:
+  - PyTorch
+  - Transformers
+github: https://github.com/alshedivat/al-folio
+demo: https://alshedivat.github.io/al-folio/
+links:
+  - { label: paper, url: https://arxiv.org/ }
+  - { label: slides, url: https://docs.google.com/presentation/ }
+  - { label: huggingface, url: https://huggingface.co/ }
+  - { label: dataset, url: https://www.kaggle.com/datasets }
+  - { label: file, url: https://example.com/report.pdf }
 related_publications: true
+has_detail: true
 ---
 
 Every project has a beautiful feature showcase page.

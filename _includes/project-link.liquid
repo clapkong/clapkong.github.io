@@ -1,0 +1,55 @@
+{%- comment -%}
+  One project link. Called by `project-links.liquid`.
+  include.label  github, demo, paper, slides, report, video, poster, blog,
+                 huggingface, dataset, file (unknown labels get a link icon)
+  include.url
+  include.style  `button` (detail page) or `icon` (card)
+{%- endcomment -%}
+{%- assign key = include.label | downcase -%}
+{%- case key -%}
+  {%- when 'github' -%}
+    {%- assign icon = 'fa-brands fa-github' -%}
+  {%- when 'demo' -%}
+    {%- assign icon = 'fa-solid fa-arrow-up-right-from-square' -%}
+  {%- when 'paper' -%}
+    {%- assign icon = 'fa-solid fa-file-lines' -%}
+  {%- when 'slides' -%}
+    {%- assign icon = 'fa-solid fa-person-chalkboard' -%}
+  {%- when 'report' -%}
+    {%- assign icon = 'fa-solid fa-file-pdf' -%}
+  {%- when 'video' -%}
+    {%- assign icon = 'fa-solid fa-video' -%}
+  {%- when 'poster' -%}
+    {%- assign icon = 'fa-solid fa-image' -%}
+  {%- when 'blog' -%}
+    {%- assign icon = 'fa-solid fa-pen-nib' -%}
+  {%- when 'huggingface' -%}
+    {%- assign icon = 'fa-brands fa-hugging-face' -%}
+  {%- when 'dataset' -%}
+    {%- assign icon = 'fa-solid fa-database' -%}
+  {%- when 'file', 'download' -%}
+    {%- assign icon = 'fa-solid fa-file-arrow-down' -%}
+  {%- else -%}
+    {%- assign icon = 'fa-solid fa-link' -%}
+{%- endcase -%}
+{%- if include.style == 'icon' -%}
+  <a
+    class="project-card-link"
+    href="{{ include.url }}"
+    target="_blank"
+    rel="noopener noreferrer"
+    title="{{ include.label }}"
+    aria-label="{{ include.label }}"
+  >
+    <i class="{{ icon }}" aria-hidden="true"></i>
+  </a>
+{%- else -%}
+  <a
+    class="{% if key == 'github' %}project-cta__primary{% else %}project-cta__outline{% endif %}"
+    href="{{ include.url }}"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <i class="{{ icon }}" aria-hidden="true"></i>{{ include.label }}
+  </a>
+{%- endif -%}

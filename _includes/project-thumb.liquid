@@ -1,0 +1,17 @@
+{%- comment -%}
+  Project thumbnail, shared by the index card and the detail header.
+  `thumbnail:` is `gradient-1` (blush), `gradient-2` (lavender) or an image path; an
+  empty one falls back to `img:` (al-folio's field), then to `gradient-1`.
+
+  include.project  the project document
+  include.class    extra class for size (`project-thumb--hero`, `--card`)
+{%- endcomment -%}
+{%- assign thumb = include.project.thumbnail | default: include.project.img | default: 'gradient-1' -%}
+{%- assign thumb_head = thumb | slice: 0, 9 -%}
+{%- if thumb_head == 'gradient-' -%}
+  <div class="project-thumb project-thumb--{{ thumb }} {{ include.class }}" aria-hidden="true"></div>
+{%- else -%}
+  <div class="project-thumb project-thumb--image {{ include.class }}" aria-hidden="true">
+    <img src="{{ thumb | relative_url }}" alt="" loading="lazy">
+  </div>
+{%- endif -%}
