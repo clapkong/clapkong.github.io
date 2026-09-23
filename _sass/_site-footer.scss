@@ -141,3 +141,25 @@
   font-size: 13px;
   line-height: 1;
 }
+
+/* -----------------------------------------------------------------------------
+ * Keep the footer at the bottom on a short page
+ *
+ * The gem's `sticky-bottom-footer` class only removes the body's bottom
+ * padding, so a page shorter than the viewport leaves the footer floating with
+ * blank space under it. Flex column plus `margin-top: auto` grows the gap above
+ * the footer instead.
+ * -------------------------------------------------------------------------- */
+
+body.sticky-bottom-footer {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh; /* mobile toolbars shrink the visual viewport */
+}
+
+/* The content grows, not the footer's margin: `margin-top: auto` would collapse
+   the designed 64px gap to nothing as soon as the page is long enough. */
+body.sticky-bottom-footer > .container[role="main"] {
+  flex: 1 0 auto;
+}

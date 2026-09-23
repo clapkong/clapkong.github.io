@@ -37,7 +37,7 @@ Here they are expected: the re-skin planned in `.claude/PLAN.md` M1–M2 creates
 
 `test/style_contract.js` enforced that boundary and **was deleted on 2026-09-21** (PLAN.md M0-S0.3), along with its `npm run lint:style-contract` script and its `unit-tests.yml` step. It would have failed on every legal override. Deleting it also gave up its other assertions — that `_config.yml` keeps `theme: al_folio_core` and the required plugins, that `third_party_libraries` SRI pins exist, and that `al_math` is pinned to a released version. **Nothing checks those now**, so when you edit the `Gemfile` or `_config.yml` plugin list, verify by hand that the two lists still agree (see failure mode 2 below).
 
-## Three failures that produce no error message
+## Failures that produce no error message
 
 Read [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md#failure-modes-that-produce-no-error-message) for the full explanation. The short version:
 
@@ -46,6 +46,15 @@ Read [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md#failure-modes-that-produce-no
 3. **This repo's baseurl is blank, and must stay blank.** `clapkong.github.io` is a GitHub _user site_: it is served from the domain root, so `_config.yml` keeps the `baseurl:` key with **no value**. Deleting the key or giving it a value are both wrong — a value prefixes every asset URL and renders the site unstyled with broken links. The blog lives at `/blog/` because `_pages/blog.md` sets `permalink: /blog/`, not because of baseurl. A plain `bundle exec jekyll build` is correct; never pass `--baseurl`. Dev server is at `http://localhost:4000/`.
 
    > Upstream's version of this file said the baseurl here is `/al-folio`, which is true of the `alshedivat/al-folio` demo and was true of this repo until 2026-09-21. It is what made `https://clapkong.github.io/` serve an unstyled page.
+
+4. **A gem's `id` and `data-*` attributes are contracts with its JS.** Rewriting a gem file from scratch drops them and nothing complains. Copy the gem file and edit the copy. A header rewritten without `id="navbar"` left `progress-bar.js` measuring zero and the scroll bar rendered behind the header, with a clean build and an empty console.
+5. **Nothing above the fixed navbar.** Same hook: `progress-bar.js` positions the scroll bar from `#navbar`. The work-in-progress notice therefore sits after `</header>` in normal flow, not as a strip above it.
+6. **The contact address must not go back into `_data/socials.yml`.** `{% social_links %}` and the al_search command palette both read that file and write a plain `mailto:` into every built page. The palette is rendered from a Liquid template inside the gem, so no include override can undo it. The address lives in `_data/contact.yml`, which is gitignored and written by CI from the `SITE_EMAIL` secret; `_data/contact.example.yml` is the tracked stand-in.
+
+## Local conventions
+
+- **Per-page CSS is scoped with `:has()`.** The default layout sets no per-page body class, so a page's styles hang off something the page alone renders, e.g. `.post:has(.about-hero)`.
+- **`_sass/` partial names must not collide with the gem's.** A local `_sass/_publications.scss` replaces the gem's partial wholesale rather than adding to it. Suffix site-owned files (`_publications-site.scss`).
 
 ## Validated local command set
 

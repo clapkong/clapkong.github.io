@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 @AGENTS.md
 
-`AGENTS.md` (imported above) is the **authoritative** agent entry point: change routing, the stop sign for gem-owned paths, the three silent failure modes, and the validated command set. Keep it short and ecosystem-neutral. Cross-repo architecture — the wrapper/tag/gem delegation table, feature gating, the v1 config contract, local overrides — lives in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md); area-to-gem ownership lives in [`docs/BOUNDARIES.md`](docs/BOUNDARIES.md).
+`AGENTS.md` (imported above) is the **authoritative** agent entry point: change routing, the stop sign for gem-owned paths, the silent failure modes, the local conventions, and the validated command set. Keep it short and ecosystem-neutral. Cross-repo architecture — the wrapper/tag/gem delegation table, feature gating, the v1 config contract, local overrides — lives in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md); area-to-gem ownership lives in [`docs/BOUNDARIES.md`](docs/BOUNDARIES.md).
 
 **Read those three before editing anything.** Everything below is Claude-specific or longer-form operational detail that does not belong in the short entry point. Do not restate facts from those files here — link to them.
 
@@ -57,6 +57,34 @@ User rule, stated 2026-09-21. It applies to new work; existing occurrences are c
 **When the user confirms a page is finished, invoke the `impeccable` skill once on that page before closing the stage.** Not on a draft, not mid-iteration: on the version the user has just signed off. Treat its findings as review notes, report them, and let the user decide what to act on.
 
 User rule, stated 2026-09-21. The point is a second pass by something that was not steering the design, at the one moment the page is stable enough for the pass to mean anything.
+
+## Commit messages
+
+Subject line: `type(scope): 무엇을 했는지 (스테이지 id)`. Keep it under ~70 characters.
+`feat` / `fix` / `docs` / `chore` / `refactor`, scope is the page or area
+(`publications`, `header`, `404`, `claude`).
+
+The body is a `-` list. **Noun phrases, not sentences.** One line per change,
+wrapped at ~80 characters. A line says what changed, and adds why in parentheses
+only when the why is not guessable from the change:
+
+```
+feat(publications): DESIGN.md §8.6 레이아웃 (M2-S2.5)
+
+- 연도 점프 사이드바, 논문 카드
+- 제목 -> PDF 링크, 중복 PDF 버튼 제거
+- 연도 점프에 URL 해시 미사용 (gem `bibsearch.js` 가 검색어로 읽음)
+- 520px 이하 배지/본문 1열
+```
+
+What does **not** go in a commit message: what was tried and rejected, how a
+value was arrived at, measurements, what surprised us. That is what
+`.claude/BUILD_LOG.md` is for, and repeating it here is the same fact in two
+places. If a line needs a paragraph to justify it, the paragraph belongs in the
+log and the commit gets the one-line version.
+
+Draft into `.claude/commit.txt` first when the user asked for a message rather
+than a commit. Punctuation ban applies (see above).
 
 ## Session log — `.claude/BUILD_LOG.md`
 
