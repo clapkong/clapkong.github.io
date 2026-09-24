@@ -1,0 +1,3 @@
+/* Intentionally empty. `_config.yml` third_party_libraries.google_fonts points
+   here: the gem's head.liquid always emits this <link>, and the site uses no
+   Roboto, Roboto Slab or Material Icons. CSP blocks a data: URI instead. */
