@@ -2,7 +2,6 @@
 layout: page
 title: projects
 permalink: /projects/
-description: A growing collection of your cool projects.
 nav: true
 nav_order: 3
 display_categories: [research, programming]
@@ -10,6 +9,10 @@ horizontal: false
 ---
 
 <!-- pages/projects.md -->
+<!-- Count instead of a subtitle: DESIGN.md §8.4 goes straight from the title
+     to the grid, and front matter `description:` is not run through Liquid. -->
+<p class="post-count">{{ site.projects | size }} projects</p>
+
 <div class="projects">
 {% if site.enable_project_categories and page.display_categories %}
   <!-- Display categorized projects -->

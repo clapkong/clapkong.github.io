@@ -6,13 +6,13 @@ description: an other project with a background image and giscus comments
 thumbnail: assets/img/9.jpg
 category: programming
 date: 2025-04-01
+importance: 12
 period: 2024.06 - 2024.08
 role: intern
 status: completed
 tech_stack:
   - Go
 giscus_comments: true
-has_detail: true
 ---
 
 Every project has a beautiful feature showcase page.

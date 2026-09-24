@@ -6,6 +6,7 @@ description: with background image
 thumbnail: assets/img/12.jpg
 category: research
 date: 2026-01-01
+importance: 4
 period: 2025.09 - 2025.12
 role: first author
 team: 3 people
@@ -22,7 +23,6 @@ links:
   - { label: dataset, url: https://www.kaggle.com/datasets }
   - { label: file, url: https://example.com/report.pdf }
 related_publications: true
-has_detail: true
 ---
 
 Every project has a beautiful feature showcase page.

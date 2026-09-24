@@ -6,8 +6,9 @@ layout: default
   breadcrumb, the thumbnail (`_includes/project-thumb.liquid`), the subtitle,
   tech stack pills, the category label, the period / role / team / status card, the description as an
   intro, link buttons (`project-links.liquid`), a divider and the `project-paper` wrapper
-  (styles in `_sass/_projects-site.scss`). Only `has_detail: true` projects
-  reach it (`_plugins/project_detail_gate.rb`).
+  (styles in `_sass/_projects-site.scss`). Every project gets this page; the
+  divider and the white sheet appear only when the body is not empty, so a
+  project with nothing but front matter still reads as a short page.
 {%- endcomment -%}
 {% if page._styles %}
   <!-- Page/Post style -->

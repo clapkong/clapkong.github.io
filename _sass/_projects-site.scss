@@ -19,6 +19,10 @@
 
 $thumb-height: 180px;
 
+/* Reading column on the detail page's white sheet. Everything on the sheet
+   shares it, so a change here moves text, code and images together. */
+$paper-column: 940px;
+
 .projects {
   .card figure {
     margin: 0;
@@ -40,9 +44,36 @@ $thumb-height: 180px;
  * cream page background. `_layouts/project.liquid` renders the wrapper.
  * -------------------------------------------------------------------------- */
 
+/* No border and no shadow: at 8% and 4% neither was visible, and the white
+   against the cream page already reads as a separate sheet.
+
+   The sheet runs the full 1170px like the header above it, but what sits on it
+   keeps the narrower measure and stays flush left, so the free space falls on
+   one side instead of being split into two gutters. */
 .project-paper {
   background: var(--color-surface);
-  padding: 40px 48px;
+  border-radius: var(--radius-md);
+  /* Wider on the left than the gem's even padding: the column is flush left,
+     so this is the margin the text actually sits in. The space left over on
+     the right stays the larger of the two, which is what keeps the sheet from
+     reading as centered. */
+  padding: 40px 48px 40px 68px;
+
+  /* One column for everything on the sheet, flush left. Text, code and images
+     used to stop at three different places: prose at a `ch` cap, code at the
+     column, and an image row 15px short of it, because the gem's grid pulls
+     its columns in by their gutter. */
+  > * {
+    margin-right: auto;
+    max-width: $paper-column;
+  }
+
+  /* The row's own negative margin already sits outside the column, and each
+     cell insets its image by the 15px gutter, so widen the row by both gutters
+     to land the images on the column's edges. */
+  > .row {
+    max-width: calc(#{$paper-column} + 30px);
+  }
 
   > :first-child {
     margin-top: 0;
@@ -66,7 +97,9 @@ $thumb-height: 180px;
 /* Thumbnail (`_includes/project-thumb.liquid`), on the card and the detail
    header. `previous`'s two gradients, blush and lavender. */
 .project-thumb {
-  border-radius: var(--radius-md);
+  /* `sm`, like `.card` in `_base.scss`: a thumbnail is a solid block of color
+     against the page, which is where a corner shows. */
+  border-radius: var(--radius-sm);
   overflow: hidden;
   position: relative;
 
@@ -94,7 +127,8 @@ $thumb-height: 180px;
 }
 
 .project-thumb--card {
-  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  /* Square at the bottom: the card body continues under it. */
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
   height: $thumb-height;
 }
 
@@ -117,11 +151,15 @@ $thumb-height: 180px;
   text-transform: uppercase;
 }
 
+/* Same family and color as `.post-description` elsewhere on the site; the size
+   and the spacing below stay as they were. */
 .project-subtitle {
-  color: var(--color-accent);
-  font-size: 13px;
+  color: var(--color-meta);
+  font-family: var(--font-serif);
+  font-size: 14px;
   letter-spacing: 0.5px;
   margin: 0 0 14px;
+  max-width: 90ch;
 }
 
 .project-meta {
@@ -163,6 +201,7 @@ $thumb-height: 180px;
   font-size: 15px;
   line-height: 1.75;
   margin: 20px 0 0;
+  max-width: 90ch; /* same reading width as the paper's prose */
 }
 
 .project-divider {
@@ -285,11 +324,13 @@ $thumb-height: 180px;
  * Detail page title size and body rhythm.
  * -------------------------------------------------------------------------- */
 
-/* The gem's `.container.mt-5` leaves 48px above the breadcrumb; pull it up. */
+/* The gem's `.container.mt-5` leaves 48px above the breadcrumb; pull it up.
+   No width of its own: the page fills the 1200px container, which the header
+   (thumbnail, title, meta card) wants. Reading width is capped further in,
+   on the paragraphs themselves. */
 .project-detail {
   margin-top: -28px;
-  margin-inline: auto;
-  max-width: 960px; // 상세 페이지 width
+
   .post-title {
     font-size: 32px;
     line-height: 1.2;
@@ -335,15 +376,25 @@ $thumb-height: 180px;
 }
 
 /* Index card: every project link as an icon row (`project-links.liquid`). */
+/* Wraps: a project can carry seven links, and at three columns on a tablet
+   they ran past the year in the corner instead of falling to a second line. */
 .project-card-links {
   display: flex;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
   margin-top: 12px;
 }
 
+/* The glyph stays 15px; the box around it is padded out to the 24px minimum
+   touch target. Height is unchanged, since the row was already 26px tall. */
 .project-card-link {
+  align-items: center;
   color: var(--color-meta);
+  display: inline-flex;
   font-size: 15px;
+  justify-content: center;
+  min-height: 24px;
+  min-width: 24px;
 
   &:hover {
     color: var(--color-accent);
@@ -408,11 +459,128 @@ $thumb-height: 180px;
   }
 }
 
-/* Prose inside the paper stops at ~90 characters; images, columns and tables
-   keep the full paper width. */
-.project-paper > p,
-.project-paper > ul,
-.project-paper > ol,
-.project-paper > details {
-  max-width: 90ch;
+/* Category heading (`_pages/projects.md` wraps it in a self-link). The global
+   link hover drew a pink underline under the grey heading; the heading takes
+   the accent itself instead. */
+.projects a:has(> h2.category) {
+  text-decoration: none;
+
+  &:hover h2.category {
+    color: var(--color-accent);
+  }
+}
+
+/* Card text. The gem sizes the title like a page heading (2rem) and the
+   description at body size, which in a three-up grid reads as two headings
+   stacked. Widening the gap between them is what gives the card a reading
+   order. */
+.project-card {
+  /* The gem leaves 12px under the title, which on a card this tight reads as a
+     gap rather than a pairing; the subtitle sets its own 6px instead. */
+  .card-title {
+    font-size: 20px;
+    line-height: 1.3;
+    margin: 0;
+  }
+
+  /* Padding is `previous`'s, tighter than the gem's even 20px.
+
+     The height of a card whose title runs two lines. Reserving it here rather
+     than on the title keeps the subtitle tucked under a one-line title and
+     drops the slack above the footer, which `margin-top: auto` already holds
+     to the floor. Without it a single two-line title made its whole row
+     taller, since a flex row is as tall as its tallest card. */
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    min-height: 190px;
+    padding: 14px 18px 16px;
+  }
+
+  /* The footer sits on the card floor, so every card in a row lines up its
+     icons and its year whatever the title, subtitle and tags took. */
+  .project-card__footer {
+    align-items: center;
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    padding-top: 12px;
+  }
+
+  /* Nothing above the footer on this card (its tags moved into it), so the
+     footer takes the floor itself. */
+  .project-card__subtitle + .project-card__footer {
+    margin-top: auto;
+  }
+
+  /* Tags standing in for the icon row keep that row's height and lose the
+     margin that separated them from it. */
+  .project-card__footer .project-card__tags {
+    margin: 0;
+    min-height: 24px;
+  }
+
+  .project-card-links {
+    margin-top: 0;
+  }
+}
+
+/* Subtitle and tech tags on the card. Both are quieter than the description:
+   the subtitle names the project in a few words, the tags are a glance, and
+   neither should compete with the title. */
+/* Always two lines tall, padded with empty space when the text is one line.
+   A one-line subtitle in one card and a two-line one in another made whole
+   rows differ in height, since a flex row is as tall as its tallest card. */
+.project-card__subtitle {
+  color: var(--color-meta);
+  font-size: 12px;
+  line-height: 1.4;
+  margin: 6px 0 0;
+  min-height: 2.8em;
+}
+
+/* Pushed to the bottom of the body, so the slack that the body's min-height
+   reserves for a two-line title falls between the subtitle and the tags rather
+   than under the tags. `.card-body` is a flex column; `auto` eats the space. */
+.project-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  list-style: none;
+  margin: auto 0 0;
+  padding: 0;
+
+  li {
+    background: var(--color-base);
+    border-radius: var(--radius-pill);
+    color: var(--color-meta);
+    font-size: 10px;
+    line-height: 1.6;
+    padding: 2px 8px;
+  }
+}
+
+/* Year on the card, above the title (mono, the same treatment the breadcrumb
+   and the detail page's period get). */
+/* As tall as an icon link, so a card with no links closes its footer at the
+   same height and does not shorten its whole row. `margin-left: auto` rather
+   than the footer's `space-between`, which has nothing to space out when the
+   year is the only thing on the row and leaves it on the left. */
+.project-card__year {
+  align-items: center;
+  color: var(--color-meta);
+  display: inline-flex;
+  flex-shrink: 0;
+  font-family: var(--font-serif);
+  font-size: 12px;
+  line-height: 1;
+  margin: 0 0 0 auto;
+  min-height: 24px;
+}
+
+/* 8px above the heading instead of the gem's 2rem: the rule under it already
+   separates the categories, and the page title's own block sat too far from
+   the first one. */
+.projects h2.category {
+  margin-top: 8px;
 }

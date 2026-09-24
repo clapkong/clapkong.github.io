@@ -32,6 +32,14 @@ body {
   background-color: var(--color-base);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* Korean wraps per character by default, which splits a word across two
+     lines ("다르다" as "다" / "르다"). `keep-all` breaks on spaces instead, as
+     English already does; `break-word` is the escape hatch for a token with no
+     space in it at all, such as a long URL, which would otherwise overflow.
+     PRODUCT.md: Korean has to read as well as English. */
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 /* -----------------------------------------------------------------------------
@@ -94,6 +102,13 @@ h6 {
 p {
   margin-top: 0;
   margin-bottom: var(--space-paragraph);
+}
+
+/* A paragraph that introduces the list under it ("결과:") belongs with it, so
+   it keeps less air than it would before another paragraph. */
+p:has(+ ul),
+p:has(+ ol) {
+  margin-bottom: 6px;
 }
 
 a {
@@ -211,10 +226,15 @@ th {
  * Radius cap, DESIGN.md §4: never sharp corners, never above 12px except pills
  * and circles. The gem's Tailwind component layer hardcodes 0.25rem/0.125rem on
  * `.card` and `.btn`; realign them with the token scale.
+ *
+ * Cards and images take `sm`, not `md`. A corner reads only where the colors
+ * either side of it differ, and a card's thumbnail fills its top corners with
+ * a solid block, so `md` curls visibly there while the same value is invisible
+ * on the white-on-white panels that keep it.
  * -------------------------------------------------------------------------- */
 
 .card {
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
 }
 
 .btn,
@@ -225,7 +245,7 @@ th {
 .rounded,
 .rounded-sm,
 .rounded-lg {
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
 }
 
 /* -----------------------------------------------------------------------------
@@ -331,4 +351,38 @@ th {
     padding-left: 0;
     border-left: 0;
   }
+}
+
+/* -----------------------------------------------------------------------------
+ * Page subtitle (`.post-description`), shared by every page on the gem's
+ * `page`, `archive` and `cv` layouts.
+ *
+ * The gem gives it body color and 2rem below, which reads as a second
+ * paragraph rather than as a caption to the title. Meta brown and a tighter
+ * gap put it with the title instead.
+ * -------------------------------------------------------------------------- */
+
+/* The heading default is 0.5em, which at 35px is 17.5px: enough air for the
+   subtitle to read as its own block rather than as part of the title. */
+.post-header .post-title {
+  margin-bottom: 6px;
+}
+
+/* `.post-count` is a count standing in for a subtitle ("21 projects"), which
+   DESIGN.md §8.4 prefers on the projects page over a tagline. Same slot, same
+   treatment: giving it its own size and a line-height of 1 made it sit closer
+   to the title than every other page's subtitle. */
+.post-description,
+.post-count {
+  color: var(--color-meta);
+  font-family: var(--font-serif);
+  font-size: 15px;
+  margin: 0 0 20px;
+}
+
+/* The gem's page layout prints `.post-description` whether or not the page has
+   one, so a page that drops `description:` is left with an empty paragraph
+   holding the gap open. */
+.post-description:empty {
+  display: none;
 }

@@ -6,9 +6,9 @@ description: a project that redirects to another website
 thumbnail: assets/img/7.jpg
 category: programming
 date: 2025-09-01
+importance: 7
 status: completed
 redirect: https://www.wikipedia.org/
-has_detail: true
 ---
 
 Every project has a beautiful feature showcase page.

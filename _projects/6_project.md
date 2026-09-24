@@ -6,12 +6,12 @@ description: a project with a short info card
 thumbnail: assets/img/5.jpg
 category: research
 date: 2025-06-01
+importance: 10
 period: 2024.12
 team: solo
 status: completed
 tech_stack:
   - Python
-has_detail: true
 ---
 
 Every project has a beautiful feature showcase page.

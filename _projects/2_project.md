@@ -6,6 +6,7 @@ description: a project with a background image and giscus comments
 thumbnail: assets/img/3.jpg
 category: research
 date: 2025-10-01
+importance: 6
 period: 2025.03 - 2025.06
 role: model training
 team: 2 people
@@ -16,7 +17,6 @@ github: https://github.com/alshedivat/al-folio
 links:
   - { label: paper, url: https://arxiv.org/ }
 giscus_comments: true
-has_detail: true
 ---
 
 Every project has a beautiful feature showcase page.

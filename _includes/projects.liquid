@@ -1,27 +1,71 @@
 {%- comment -%}
-  LOCAL OVERRIDE. Changed from the gem: the card links to the detail page only
-  when `has_detail: true`, through the title stretched over the card so the
-  icon links are not nested inside it (see `_plugins/project_detail_gate.rb`), and the
-  thumbnail is `project-thumb.liquid` (gradient when there is no image), and
-  the github icon became every link as an icon row (`project-links.liquid`).
+  LOCAL OVERRIDE. Changed from the gem: every card links to its detail page,
+  through the title stretched over the card so the icon links are not nested
+  inside it; the thumbnail is `project-thumb.liquid` (a gradient when there is
+  no image); and the github icon became every link as an icon row
+  (`project-links.liquid`).
+
+  Every project has a detail page. Whether that page carries the white sheet is
+  decided by `_layouts/project.liquid` from the body being empty or not, so
+  nothing here has to be flagged per project.
 {%- endcomment -%}
-{%- assign linked = false -%}
-{%- if project.redirect or project.has_detail == true -%}{%- assign linked = true -%}{%- endif -%}
 <div class="col">
-  <div class="card h-100 project-card{% if linked %} hoverable{% endif %}">
+  <div class="card h-100 project-card hoverable">
     {% include project-thumb.liquid project=project class='project-thumb--card' %}
     <div class="card-body">
-      <h2 class="card-title">
-        {%- if linked -%}
-          <a class="project-card__main" href="{% if project.redirect %}{{ project.redirect }}{% else %}{{ project.url | relative_url }}{% endif %}">
-            {{- project.title -}}
-          </a>
-        {%- else -%}
-          {{ project.title }}
+      {%- comment -%}
+        Year from `period` ("2025.05 - 2025.07"), else from `date`. A project
+        that ran across a new year shows both.
+      {%- endcomment -%}
+      {%- if project.period -%}
+        {%- assign y_start = project.period | slice: 0, 4 -%}
+        {%- assign y_end = project.period | split: '-' | last | strip | slice: 0, 4 -%}
+      {%- else -%}
+        {%- assign y_start = project.date | date: '%Y' -%}
+        {%- assign y_end = y_start -%}
+      {%- endif -%}
+      <h3 class="card-title">
+        <a class="project-card__main" href="{% if project.redirect %}{{ project.redirect }}{% else %}{{ project.url | relative_url }}{% endif %}">
+          {{- project.title -}}
+        </a>
+      </h3>
+      {%- if project.subtitle %}
+        <p class="project-card__subtitle">{{ project.subtitle }}</p>
+      {%- endif %}
+      {%- comment -%}
+        No `description` here. It repeated what `subtitle` says in the same size
+        and color, and three lines of it per card pushed the grid to one row per
+        screen. The card is a pointer; the description opens the detail page as
+        its intro, which every project has (`has_detail: true`).
+      {%- endcomment -%}
+      {%- comment -%}
+        Links and year share one row on the card floor. The year used to be
+        positioned out of the flow, which let it sit on top of whatever ended
+        up in that corner (a wrapped tech tag, on a project with no links).
+
+        A project with no links would leave that row's left half empty, so the
+        tags move down into it and the row above disappears.
+      {%- endcomment -%}
+      {%- assign has_links = false -%}
+      {%- if project.github or project.demo or project.links -%}{%- assign has_links = true -%}{%- endif -%}
+      {%- capture tags -%}
+        {%- if project.tech_stack -%}
+          <ul class="project-card__tags" aria-label="tech stack">
+            {%- for tech in project.tech_stack %}
+              <li>{{ tech }}</li>
+            {%- endfor %}
+          </ul>
         {%- endif -%}
-      </h2>
-      <p class="card-text">{{ project.description }}</p>
-      {% include project-links.liquid project=project style='icon' %}
+      {%- endcapture -%}
+      {%- if has_links %}{{ tags }}{% endif %}
+      <div class="project-card__footer">
+        {%- unless has_links %}{{ tags }}{% endunless %}
+        {% include project-links.liquid project=project style='icon' %}
+        <p class="project-card__year">
+          {{ y_start -}}
+          {%- unless y_end == y_start %} - {{ y_end }}{% endunless %}
+        </p>
+      </div>
     </div>
   </div>
 </div>

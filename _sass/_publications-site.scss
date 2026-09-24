@@ -312,13 +312,9 @@
  * which outweighs the cards it filters.
  * -------------------------------------------------------------------------- */
 
-/* `.post-description` above leaves 32px, and the gem opens `.publications` with
-   another 2rem below. Both are set for a page of prose, not for one small
-   field. */
-.pub-layout {
-  margin-top: -12px;
-}
-
+/* The gem opens `.publications` with 2rem below the subtitle, set for a page of
+   prose rather than for one small field. (The subtitle's own gap is handled
+   globally in `_base.scss`.) */
 .pub-layout .publications {
   margin-top: 16px;
 }

@@ -6,8 +6,8 @@ description: another project with an image 🎉
 thumbnail: assets/img/6.jpg
 category: programming
 date: 2025-03-01
+importance: 15
 status: completed
-has_detail: true
 ---
 
 Every project has a beautiful feature showcase page.

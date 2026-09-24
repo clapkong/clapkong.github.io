@@ -6,6 +6,7 @@ description: a project with a table in the body
 thumbnail: assets/img/11.jpg
 category: programming
 date: 2025-08-01
+importance: 8
 period: 2025.05 - 2025.07
 role: backend
 team: solo
@@ -14,7 +15,6 @@ tech_stack:
   - FastAPI
   - PostgreSQL
 github: https://github.com/alshedivat/al-folio
-has_detail: true
 ---
 
 Every project has a beautiful feature showcase page.

@@ -79,25 +79,39 @@ categories: category
 ---
 layout: project
 title: Oxford-IIIT Pet Segmentation
-description: 카드에 보이는 한두 문장
-thumbnail: gradient-1 # 카드와 상세 헤더. gradient-1(핑크), gradient-2(보라), 또는 이미지 경로
+subtitle: 카드에 보이는 한 줄 설명
+thumbnail: gradient-1 # 카드와 상세 헤더. gradient-1(핑크), gradient-2(라벤더), 또는 이미지 경로
 category: research # _pages/projects.md 의 display_categories 중 하나
-date: 2025-04-01 # 정렬 기준. 빈 값으로 두면 빌드가 실패한다
+date: 2025-04-01 # 빈 값으로 두면 빌드가 실패한다
+importance: 5 # 목록 순서. 작은 숫자가 앞
+period: 2025.03 - 2025.06 # 카드 오른쪽 아래 연도의 출처
 github: https://github.com/... # 있으면 카드에 아이콘
 ---
 ```
 
 상세 페이지용 필드:
 
-- `has_detail: true`: 이게 있어야 상세 페이지가 생기고 카드가 링크된다. 없거나 `false` 면 카드만 보인다
-- `subtitle`: 제목 아래 한 줄
-- `description`: 카드 문구이자, 상세 페이지에서 흰 본문 위에 나오는 소개 문단
+모든 프로젝트에 상세 페이지가 생긴다. 본문을 쓰지 않으면 흰 본문 면 없이 아래 항목들만 나오는 짧은 페이지가 된다.
+
+- `subtitle`: 제목 아래 한 줄. **카드에서는 이게 유일한 설명**이므로 한 줄로 내용이 그려지게 쓴다
+- `description`: 상세 페이지에서 흰 본문 위에 나오는 소개 문단. 카드에는 안 나온다
 - `period`, `role`, `team`, `status`: 태그 아래 정보 카드. `role` 은 맡은 부분을 짧게(`co-first author`, `U-Net & CLIP models`), `team` 은 인원(`2 people`, `solo`). 비운 칸은 안 나온다
 - `category`: 제목 위 작은 라벨로도 나온다
 - `tech_stack`: 태그 목록
 - `github`, `demo`, `links`: 상세 페이지의 버튼이자 카드의 아이콘. 그 밖의 링크는 `links:` 에 `- { label: paper, url: https://... }` 식으로 넣는다. github, demo 다음에 `links:` 에 적은 순서대로 나온다. label 이 `paper`, `slides`, `report`, `video`, `poster`, `blog`, `huggingface`, `dataset`, `file` 이면 맞는 아이콘이 붙고, 나머지는 링크 아이콘 (목록은 `_includes/project-link.liquid`)
 
-`thumbnail` 을 비우면 `img`, 그것도 없으면 `gradient-1` 이 나온다. 카테고리는 `research`, `programming` 두 가지(`_pages/projects.md` 의 `display_categories`).
+### 순서와 숨기기
+
+- `importance`: **목록 순서**. 작은 숫자가 앞에 온다. 카테고리 안에서 정렬되므로 research 와 programming 이 서로 번호를 다퉈도 상관없다. 빠뜨리면 그 프로젝트가 맨 앞으로 간다
+- `published: false`: 목록에서 **카드까지 감춘다**. 상세 페이지도 안 생긴다. 줄만 지우면 돌아온다
+
+### 썸네일
+
+`thumbnail` 을 비우면 `img`, 그것도 없으면 `gradient-1` 이 나온다.
+
+그라디언트는 핑크(`gradient-1`)와 라벤더(`gradient-2`) 둘뿐이다. **같은 색이 나란히 오지 않게 손으로 번갈아 적는다.** 한 카테고리 안에서 `importance` 순서대로 훑으면서 그라디언트를 쓰는 것끼리만 번갈아 주면 된다(이미지 썸네일은 건너뛴다). 자동으로 계산하지 않는 이유는, 목록은 자리를 알지만 상세 페이지는 자기 자리를 몰라서 둘의 색이 어긋나기 때문이다.
+
+카테고리는 `research`, `programming` 두 가지(`_pages/projects.md` 의 `display_categories`).
 
 ### 상세 페이지: Notion 에서 쓰고 변환
 

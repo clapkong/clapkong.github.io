@@ -6,6 +6,7 @@ description: with background image
 thumbnail: assets/img/4.jpg
 category: research
 date: 2025-05-01
+importance: 11
 period: 2024.09 - 2024.12
 role: data pipeline
 team: 5 people
@@ -17,7 +18,6 @@ links:
   - { label: huggingface, url: https://huggingface.co/ }
   - { label: dataset, url: https://www.kaggle.com/datasets }
 related_publications: true
-has_detail: true
 ---
 
 Every project has a beautiful feature showcase page.

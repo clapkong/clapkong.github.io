@@ -5,6 +5,12 @@
 
   include.project  the project document
   include.class    extra class for size (`project-thumb--hero`, `--card`)
+
+  The gradient is whatever the front matter says, on the card and on the detail
+  page alike. Alternating it by grid position instead made the two disagree,
+  since a detail page has no position. Keeping blush and lavender from
+  repeating is therefore done in the content: write them alternating down the
+  `importance` order within a category.
 {%- endcomment -%}
 {%- assign thumb = include.project.thumbnail | default: include.project.img | default: 'gradient-1' -%}
 {%- assign thumb_head = thumb | slice: 0, 9 -%}

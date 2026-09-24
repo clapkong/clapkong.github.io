@@ -737,3 +737,30 @@ optional `github:` 를 지원한다. 그래서 이번에는 `nav: false` 만 내
 - created: assets/css/no-google-fonts.css
 - modified: \_config.yml (third_party_libraries.google_fonts), \_sass/\_projects-site.scss
   **Summary**: critique 다섯 항목 중 둘만 반영했다. 본문 줄 길이는 70ch / 85ch / 90ch 비교 캡처를 보고 사용자가 90ch 로 정했다. 문단, 목록, 토글에만 걸고 이미지, 컬럼, 표는 종이 폭 그대로다. 한글이 섞이면 `ch` 가 영문 폭 기준이라 한 줄 한글 수는 더 적다. Google Fonts 는 gem `head.liquid` 가 조건 없이 `<link>` 를 넣어서 URL 을 비우면 `href=""` 로 현재 페이지를 CSS 로 다시 받는다. CSP `style-src` 가 `data:` 를 막아서 빈 로컬 CSS 를 가리키게 했다. head 를 shadow 하는 것보다 gem 업데이트에 안전하다. 끄기 전에 빌드 결과를 뒤졌다: Roboto 는 Tailwind body 기본값뿐(`_base.scss` 가 덮음), al_search 팔레트는 Material Icons 대신 SVG 아이콘, distill 은 시스템 폰트 스택 안의 이름일 뿐. 이득은 렌더를 막는 외부 CSS 요청 하나라 작다. 그라디언트, accent 대비, Slides 임베드는 사용자가 유지로 결정. 카드 아이콘 크기 지적은 상세 페이지 범위 밖이라 뺐다.
+
+---
+
+## [2026-09-24 15:50 KST] M2-S2.6: projects 목록 카드 + 페이지 부제 전역화
+
+**Status**: ✅ completed
+**Files**:
+
+- deleted: \_plugins/project_detail_gate.rb
+- modified: \_includes/projects.liquid, \_includes/project-thumb.liquid, \_layouts/project.liquid, \_pages/projects.md, \_projects/[1-9]\_project.md, \_sass/\_base.scss, \_sass/\_projects-site.scss, \_sass/\_publications-site.scss, \_sass/\_secret.scss, .claude/CONTENT_GUIDE.md, .al-folio-overrides.yml
+  **Summary**: 카드를 previous §9.5 구조로 다시 짰다. 한 번 통째로 넣었다가 사용자가 전부 되돌렸는데, 디자인이 아니라 hover 가 달라 보여서였다. 원인은 `.project-card` 에서 `transition` 을 다시 선언하면서 gem `.hoverable` 의 `transform` 을 목록에서 빠뜨린 것이다. 그래서 4px 리프트만 전환 없이 튀었다. 그 뒤로는 한 항목씩 넣고 확인받았다.
+
+  카드에서 `description` 을 뺐다. `subtitle` 과 같은 말을 같은 크기로 두 번 하고 있었고, 3 줄이면 한 화면에 한 줄만 들어왔다. 대신 `subtitle` 이 카드의 유일한 설명이 됐다. 줄 높이를 맞추려고 부제를 2 줄로 고정하고, 제목은 `min-height` 대신 `.card-body` 에 190px 을 줬다. 제목에 걸면 한 줄짜리 제목 밑에 빈 줄이 생겨 부제가 떠 보인다. 남는 공간은 부제와 태그 사이로 몰린다.
+
+  연도(`period` 의 앞 4 자리)를 카드에 넣었다. 처음에는 오른쪽 아래에 띄웠는데 태그가 그 자리로 들어와 겹쳤고, `.card-body` 에 `position: relative` 를 준 탓에 제목의 stretched `::after` 기준까지 바뀌어 썸네일이 클릭되지 않았다. 아이콘 행과 한 줄로 묶어 해결했다. 링크가 없는 카드는 태그가 그 행으로 내려온다.
+
+  `has_detail` 을 지웠다. 21 건 전부 true 라 값이 하나뿐인 스위치였고, 흰 paper 유무는 레이아웃이 본문으로 이미 판단한다. 카드까지 숨기려면 Jekyll 기본 `published: false` 를 쓴다. 정렬은 al-folio 기본 `importance` 로 돌리고 현재 순서대로 21 개에 번호를 넣었다. 그라디언트 교대는 카드 위치로 계산했다가 되돌렸다: 상세 페이지는 자기 위치를 모르므로 목록과 색이 어긋난다. front matter 값을 손으로 번갈아 적는 쪽으로 갔다.
+
+  impeccable 2 회차(목록). 반영: 태블릿 768px 에서 아이콘 행이 연도를 40px 침범(`flex-wrap` 없음), 아이콘 클릭 영역 19x26 -> 24x24(글리프는 15px 그대로, 행 높이는 오히려 2px 감소), 카드 제목 h2 -> h3. 유지: 태그 4.23:1 / 부제 4.49:1 대비, 카테고리 제목 1.15:1(al-folio 스타일 유지), 같은 모양 카드 21 개.
+
+  페이지 부제(`.post-description`)를 전역으로 바꿨다. Georgia 15px 갈색, 제목과 6px, 아래 20px. `page` / `archive` / `cv` 세 레이아웃이 공유한다. projects 는 al-folio 샘플 문구 대신 `N projects`(`.post-count`, 같은 규칙). front matter `description:` 은 Liquid 를 계산하지 않아 본문 맨 위로 뺐다. publications 가 옛 32px 을 상쇄하던 `-12px` 도 같이 지웠다. secret 은 배경이 어두워 갈색이 3.68:1 이라 글씨체만 맞추고 색은 연분홍을 유지했다.
+
+  상세 페이지 폭: 흰 면을 컨테이너 전체(1170px)로 넓히고 내용만 940px 왼쪽 정렬로 뒀다. 예전에는 문단(90ch), 이미지(부트스트랩 컬럼이 gutter 만큼 안으로 들어감), 코드 블록이 서로 다른 지점에서 끝났다. `$paper-column` 하나로 묶고 `.row` 만 gutter 두 개를 더해 보정했다. 왼쪽 여백 68px, 오른쪽 남는 공간 162px 로 가운데 정렬처럼 보이지 않게 했다.
+
+  전역 본문 서식 둘을 추가했다. `word-break: keep-all`(한글이 글자 단위로 끊겨 "다르다" 가 "다 / 르다" 가 된다)과 목록 앞 문단 여백 6px. 블로그에도 적용된다. 블로그 작업 때 무엇을 `_base.scss` 로 올릴지는 PROGRESS S2.3 에 목록으로 남겼다.
+
+  검증: HEAD + 스테이징만으로 워크트리를 만들어 별도 포트에서 빌드했다. 15 개 주소 전부 200, 콘솔 에러 0, 실패 요청 0. 다른 세션의 about / section-label / `.gitignore` 변경은 빠져 있다. publications 와 cv 의 부제는 아직 al-folio 샘플 문구다.
