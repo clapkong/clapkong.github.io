@@ -1,0 +1,102 @@
+{% comment %}
+  Site copy of al_folio_cv's templates/cv/projects.liquid. Changed: a range that starts and
+  ends in the same month shows it once, and dates read "Sep. 2025" as in the PDF CV
+  (via cv/month.liquid) instead of the gem's year only. A site-relative `url:` opens in the same tab.
+{% endcomment %}
+{% comment %}
+  Unified projects entry renderer for both formats
+  Handles both:
+  - RenderCV: name, date (or start_date/end_date), url, summary, highlights
+  - JSONResume: name, startDate/endDate, url, summary, highlights
+{% endcomment %}
+
+<ul class="card-text font-weight-light list-group list-group-flush">
+  {% for entry in entries %}
+    <li class="list-group-item">
+      {% comment %} `capture` keeps the surrounding whitespace, so strip before testing for emptiness {% endcomment %}
+      {% capture start_date %}
+        {% if entry.start_date %}{{ entry.start_date }}{% elsif entry.startDate %}{{ entry.startDate }}{% endif %}
+      {% endcapture %}
+      {% assign start_date = start_date | strip %}
+      {% capture end_date %}
+        {% if entry.end_date %}{{ entry.end_date }}{% elsif entry.endDate %}{{ entry.endDate }}{% endif %}
+      {% endcapture %}
+      {% assign end_date = end_date | strip %}
+      {% comment %}
+        A project usually carries a single point-in-time `date` rather than a start/end pair. `al_cv_sort_by_date`
+        already orders on it, so render it too rather than silently dropping the badge.
+      {% endcomment %}
+      {% capture point_date %}
+        {% if entry.date %}{{ entry.date }}{% elsif entry.releaseDate %}{{ entry.releaseDate }}{% endif %}
+      {% endcapture %}
+      {% assign point_date = point_date | strip %}
+
+      {% if start_date != '' %}
+        {% capture startDate %}{% include cv/month.liquid date=start_date %}{% endcapture %}
+        {% if end_date != '' %}
+          {% capture endDate %}{% include cv/month.liquid date=end_date %}{% endcapture %}
+        {% else -%}
+          {%- assign endDate = 'Present' -%}
+        {%- endif %}
+        {% if startDate == endDate %}
+          {% assign date = startDate %}
+        {% else %}
+          {% assign date = startDate | append: ' - ' | append: endDate %}
+        {% endif %}
+      {% elsif point_date != '' %}
+        {% comment %} A standalone date is a point in time, never an open-ended range, so it renders as one date {% endcomment %}
+        {% capture date %}{% include cv/month.liquid date=point_date %}{% endcapture %}
+      {% else %}
+        {% assign date = null %}
+      {% endif %}
+
+      {% capture entry_body %}
+        {% if entry.url %}
+          <h6 class="title font-weight-bold">
+            {% comment %} Site pages open in the same tab; only outside links get a new one. {% endcomment %}
+            {% if entry.url contains '://' %}
+              <a href="{{ entry.url }}" target="_blank" rel="noopener">{{ entry.name }}</a>
+            {% else %}
+              <a href="{{ entry.url | relative_url }}">{{ entry.name }}</a>
+            {% endif %}
+          </h6>
+        {% else %}
+          <h6 class="title font-weight-bold">{{ entry.name }}</h6>
+        {% endif %}
+
+        {% if entry.summary %}
+          <p>{{ entry.summary | markdownify | remove: '<p>' | remove: '</p>' }}</p>
+        {% endif %}
+
+        {% if entry.highlights %}
+          <ul class="items">
+            {% for item in entry.highlights %}
+              <li>
+                <span class="item">{{ item | markdownify | remove: '<p>' | remove: '</p>' }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endcapture %}
+
+      {% if date %}
+        <div class="row">
+          <div class="col-xs-2 col-sm-2 col-md-2 text-center date-column">
+            <table class="table-cv">
+              <tbody>
+                <tr>
+                  <td>
+                    <span class="badge font-weight-bold danger-color-dark text-uppercase align-middle" style="min-width: 75px">{{ date }}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="col-xs-10 col-sm-10 col-md-10 mt-2 mt-md-0">{{ entry_body }}</div>
+        </div>
+      {% else %}
+        {{ entry_body }}
+      {% endif %}
+    </li>
+  {% endfor %}
+</ul>

@@ -1,0 +1,615 @@
+/*******************************************************************************
+ * CV page: vertical timeline over the al_folio_cv markup (DESIGN.md §9.6).
+ *
+ * The gem's experience and education templates render the same markup: a
+ * date column (period badge + location) beside a content column of
+ * `h6.title` (position / degree), `h6` (company / institution), `h6`
+ * (summary / area) and `ul.items`. Nothing here edits that markup. On wide
+ * screens the date column stays on the left and the timeline runs between
+ * the two columns; below $cv-stack the columns stack and the line moves to
+ * the left edge.
+ *
+ * Only `#experience`, `#education` and `#leadership` are covered (the last
+ * is drawn with the experience template by `_includes/cv/render.liquid`).
+ * Sections the gem renders with another template (awards, skills, ...) or as
+ * a "generic section" keep the al-folio look.
+ ******************************************************************************/
+
+$timeline-dot: 13px;
+$timeline-logo: 30px; /* entries with `logo:` in cv.yml */
+$date-column: 96px; /* narrowest that keeps "Seoul, Korea" (with pin) and "United Kingdom" on one line */
+$column-gap: 50px; /* room for a 30px logo circle on the line */
+$axis: $date-column + $column-gap * 0.5; /* x of the timeline line */
+$stack-pad: 32px; /* stacked layout: line at 6px, content at 32px */
+$cv-stack: 575.98px;
+
+$cv-sections: "#experience + .card", "#education + .card", "#leadership + .card";
+$cv-entry-gap: 25px; /* text of one entry to the next, in every dated section */
+
+/* First line of an entry. Weight 700 on purpose: Georgia has no 500 face. */
+@mixin cv-heading {
+  color: var(--color-text);
+  font-family: var(--font-serif);
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 1.3;
+  margin: 0 0 3px !important;
+}
+
+/* Bullet lists under an entry; projects uses the same so every list on the page matches. */
+@mixin cv-bullets {
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: 14px !important;
+  line-height: 1.55;
+  margin: 0;
+  padding-left: 16px;
+
+  li {
+    margin: 0;
+  }
+
+  li + li {
+    margin-top: 2px;
+  }
+}
+
+@mixin cv-subline {
+  color: var(--color-meta);
+  font-family: var(--font-serif);
+  font-size: 15px !important;
+  font-weight: var(--weight-regular) !important;
+  line-height: 1.4;
+  margin: 0 0 7px !important;
+}
+
+@each $section in $cv-sections {
+  #{$section} {
+    .list-group {
+      padding-left: 0;
+      position: relative;
+
+      &::before {
+        background: var(--color-border-hover);
+        bottom: 6px;
+        content: "";
+        left: $axis;
+        position: absolute;
+        top: 6px;
+        width: 1px;
+      }
+    }
+
+    .list-group-item {
+      background: transparent;
+      border: 0;
+      list-style: none;
+      margin-bottom: $cv-entry-gap;
+      padding: 0;
+      position: relative;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      /* Every dot is the same pink: no active/inactive variant. */
+      &::before {
+        background: var(--color-accent);
+        border-radius: var(--radius-full);
+        content: "";
+        height: $timeline-dot;
+        left: $axis - $timeline-dot * 0.5 + 0.5px;
+        position: absolute;
+        top: 3px;
+        width: $timeline-dot;
+      }
+    }
+
+    /* An entry with a logo draws the image instead of the dot. */
+    .list-group-item.has-logo::before {
+      display: none;
+    }
+
+    .cv-logo {
+      background: var(--color-surface);
+      border: 2px solid var(--color-accent);
+      border-radius: var(--radius-full);
+      box-sizing: border-box;
+      height: $timeline-logo;
+      left: $axis - $timeline-logo * 0.5 + 0.5px;
+      object-fit: contain;
+      padding: 3px;
+      position: absolute;
+      top: -5px; /* centred on the first line of the heading */
+      width: $timeline-logo;
+      z-index: 1;
+    }
+
+    /* nowrap: a long bullet must not push the content column under the dates. */
+    .row {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: $column-gap;
+      margin: 0;
+    }
+
+    .row > div {
+      max-width: none;
+      padding: 0;
+      transform: none; /* gem nudges .date-column by (-15px, -5px) */
+    }
+
+    .row > .date-column {
+      flex: 0 0 $date-column;
+      transform: translateY(-2px); /* the smaller date text sits low beside the bold heading */
+      width: $date-column;
+    }
+
+    .row > div + div {
+      display: flex;
+      flex: 1 1 0;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    /* Period over location, both right-aligned against the line. */
+    .date-column table,
+    .date-column tbody {
+      display: block;
+      margin: 0;
+    }
+
+    .date-column tbody {
+      align-items: flex-end;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .date-column td {
+      border: 0;
+      padding: 0;
+    }
+
+    .date-column .badge {
+      all: unset;
+      background: transparent !important;
+      color: var(--color-accent) !important;
+      display: block;
+      font-family: var(--font-serif);
+      font-size: 13px;
+      font-weight: var(--weight-regular) !important;
+      line-height: 1.45;
+      padding: 0 !important;
+      text-align: right;
+      text-transform: none !important;
+    }
+
+    .location {
+      color: var(--color-accent);
+      font-family: var(--font-serif);
+      font-size: 12.5px;
+      line-height: 1.45;
+      margin: 0;
+      text-align: right;
+      white-space: normal; /* gem sets nowrap; a long place must wrap in the column */
+    }
+
+    /* No margin: the gem's markup already puts a newline (one space) after it. */
+    .iconlocation {
+      color: var(--color-accent);
+      font-size: 11px;
+      margin-right: 0;
+    }
+
+    /* A linked position / degree keeps its line's colour. */
+    h6 a {
+      color: inherit;
+
+      &:hover {
+        color: var(--color-accent);
+      }
+    }
+
+    /* The gem sets font-size / font-style inline on the h6s, hence !important. */
+    h6.title {
+      @include cv-heading;
+      order: 1;
+    }
+
+    h6.title + h6 {
+      @include cv-subline;
+      order: 2;
+    }
+
+    h6.title + h6 + h6 {
+      color: var(--color-text);
+      font-family: var(--font-sans);
+      font-size: 14px !important;
+      font-style: normal !important;
+      font-weight: var(--weight-regular);
+      line-height: 1.55;
+      margin: 0 0 7px !important;
+      order: 3;
+    }
+
+    ul.items {
+      @include cv-bullets;
+      order: 4;
+    }
+  }
+}
+
+/* Education leads with the institution: swap the first two lines. Its
+   highlights are facts (GPA, honours), so they carry no marker. */
+#education + .card {
+  h6.title + h6 {
+    @include cv-heading;
+    order: 1;
+  }
+
+  h6.title {
+    @include cv-subline;
+    order: 2;
+  }
+
+  ul.items {
+    list-style: none;
+    padding-left: 0;
+  }
+}
+
+/* The gem's Tailwind sets .ml-md-4, .mt-2 and .text-center with !important
+   inside @layer components, which beats any unlayered !important. */
+@layer components {
+  #experience + .card,
+  #education + .card,
+  #leadership + .card {
+    .row h6 {
+      margin-left: 0 !important;
+    }
+
+    .row > div {
+      margin: 0 !important;
+      text-align: left !important;
+    }
+
+    .row > .date-column {
+      text-align: right !important;
+
+      @media (max-width: $cv-stack) {
+        text-align: left !important;
+      }
+    }
+  }
+}
+
+/* Narrow screens: the date column leaves too little for the text, so
+   the dates go back on top of each entry and the line to the left edge. */
+@media (max-width: $cv-stack) {
+  @each $section in $cv-sections {
+    #{$section} {
+      .list-group {
+        padding-left: $stack-pad;
+
+        &::before {
+          left: 6px;
+        }
+      }
+
+      .list-group-item::before {
+        left: -$stack-pad;
+        top: 4px;
+      }
+
+      .cv-logo {
+        height: 24px;
+        left: 6px - $stack-pad - 12px + 0.5px;
+        top: -1px;
+        width: 24px;
+      }
+
+      .row {
+        display: block;
+      }
+
+      .row > .date-column {
+        transform: none;
+        width: auto;
+      }
+
+      .date-column tbody {
+        align-items: baseline;
+        flex-direction: row;
+        justify-content: space-between;
+        margin-bottom: 2px;
+      }
+
+      .date-column .badge,
+      .location {
+        text-align: left;
+      }
+    }
+  }
+}
+
+/* Publications, projects and awards: the year badge keeps the gem's look, but
+   its column takes the timeline's width and gap, so every section's text
+   starts at the same x. Wide screens only; narrow ones keep the gem layout. */
+$cv-list-sections: "#publications + .card", "#projects + .card", "#awards + .card";
+$list-badge-scale: 0.95; /* badge, its text, and its frame of rules, all together */
+$list-badge: $date-column * $list-badge-scale;
+
+/* Their title and second line (venue / awarder) read like the timeline's. */
+@each $section in $cv-list-sections {
+  #{$section} {
+    h6.title {
+      @include cv-heading;
+    }
+
+    /* A linked title (project page, paper) keeps the heading colour. */
+    h6.title a {
+      color: inherit;
+
+      &:hover {
+        color: var(--color-accent);
+      }
+    }
+
+    h6.title + h6 {
+      @include cv-subline;
+
+      /* The venue sits in an <em> whose own colour would override the line's. */
+      em {
+        color: inherit;
+      }
+    }
+  }
+}
+
+@media (min-width: $cv-stack + 0.02px) {
+  @each $section in $cv-list-sections {
+    #{$section} {
+      .list-group {
+        padding-left: 0;
+      }
+
+      .list-group-item {
+        padding-left: 0;
+        padding-right: 0;
+      }
+
+      /* The badge column takes the whole gutter (date column + gap), so text
+         still starts where the timeline sections' does. */
+      .row {
+        display: flex;
+        flex-wrap: nowrap;
+        margin: 0;
+      }
+
+      .row > div {
+        max-width: none;
+        padding: 0;
+        transform: none;
+      }
+
+      .row > div:first-child:not(:only-child) {
+        flex: 0 0 $date-column + $column-gap;
+        width: $date-column + $column-gap;
+      }
+
+      /* Badge in a frame of two rules 10px wider on each side, centred between
+         the card edge and the title (hence -8px: half the card's 16px padding). */
+      .table-cv {
+        left: -8px;
+        margin: 0 auto;
+        position: relative;
+        top: -3px; /* a little closer to the title's first line */
+        width: $list-badge + 20px * $list-badge-scale;
+      }
+
+      .badge {
+        box-sizing: border-box;
+        min-width: 0 !important; /* inline style="min-width: 75px" */
+        width: $list-badge;
+      }
+
+      .row > div + div {
+        flex: 1 1 0;
+        min-width: 0;
+      }
+    }
+  }
+
+  /* Same Tailwind layer problem as above: .ml-md-4 and .mt-2 are !important there. */
+  @layer components {
+    #publications + .card,
+    #projects + .card,
+    #awards + .card {
+      .row > div {
+        margin: 0 !important;
+      }
+
+      .ml-md-4 {
+        margin-left: 0 !important;
+      }
+    }
+  }
+}
+
+@each $section in $cv-list-sections {
+  #{$section} .list-group-item {
+    list-style: none; /* the gem's <li> showed a stray disc left of the badge */
+  }
+
+  /* The badge sat on a 24px line box, leaving 6.5px above it and 2.5px below
+     inside the two rules. line-height 0 plus equal padding centres it. */
+  #{$section} .table-cv td {
+    border-bottom-color: var(--color-border-hover);
+    border-top-color: var(--color-border-hover);
+    line-height: 0;
+    padding: 4.5px * $list-badge-scale 0;
+    text-align: center !important;
+    vertical-align: middle;
+  }
+
+  #{$section} .badge {
+    display: inline-block;
+    font-size: 12px * $list-badge-scale !important;
+    vertical-align: middle;
+  }
+
+  #{$section} ul.items {
+    @include cv-bullets;
+  }
+
+  /* Only projects.liquid tags its column .date-column, which the gem pins to
+     75px and nudges by (-15px, -5px); on phones that left its badge off-line. */
+  #{$section} .row > .date-column {
+    transform: none;
+    width: 100%; /* like the other sections' column on phones; wide screens set their own */
+  }
+
+  /* The gem ends an entry with a <p> (14px margin) or a list (16px), which
+     made projects 2px looser than the rest. Drop that and set the gap here. */
+  #{$section} .list-group-item .row > div + div > :last-child {
+    margin-bottom: 0;
+  }
+
+  #{$section} .list-group-item + .list-group-item {
+    margin-top: $cv-entry-gap;
+  }
+}
+
+/* Awards: a `semesters:` list (see _includes/cv/awards.liquid) puts "4 sem." or
+   "Fall 2024" in the badge, lower case, and the semesters as chips under the summary. */
+#awards + .card {
+  .badge {
+    text-transform: none !important;
+  }
+
+  p:has(+ .cv-chips) {
+    margin-bottom: 6px;
+  }
+
+  .cv-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    list-style: none;
+    margin: 0 0 14px;
+    padding: 0;
+
+    li {
+      background: var(--color-soft-bg);
+      border-radius: var(--radius-pill);
+      color: var(--color-accent);
+      font-family: var(--font-sans);
+      font-size: 11px;
+      line-height: 1.6;
+      padding: 2px 8px;
+    }
+  }
+}
+
+/* Contact and Languages: name in the date column's place (pink serif, right
+   aligned), value where every other section's text starts. */
+.cv-kv-row {
+  align-items: baseline;
+  display: flex;
+
+  & + & {
+    margin-top: 10px;
+  }
+}
+
+.cv-kv-k {
+  color: var(--color-accent);
+  flex: 0 0 $date-column;
+  font-family: var(--font-serif);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: right;
+}
+
+.cv-kv-v {
+  color: var(--color-text);
+  flex: 1 1 0;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.55;
+  margin-left: $column-gap;
+  min-width: 0;
+
+  a {
+    color: inherit;
+
+    &:hover {
+      color: var(--color-accent);
+    }
+  }
+}
+
+/* Interests: the keywords as one line of heading-sized serif text, split by
+   pink dots drawn in CSS (no dot character in the copy). */
+.cv-interests {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+
+  li {
+    color: var(--color-text);
+    font-family: var(--font-serif);
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  li + li::before {
+    background: var(--color-accent);
+    border-radius: var(--radius-full);
+    content: "";
+    display: inline-block;
+    height: 5px;
+    margin: 0 12px;
+    position: relative;
+    top: -2px;
+    vertical-align: middle;
+    width: 5px;
+  }
+}
+
+/* The keyword and list sections keep the gem layout, flush with the heading
+   (the gem's lists and wrappers indented them for no reason of ours), with
+   the name and icon in pink serif. */
+$cv-plain-sections: "#languages + .card", "#skills + .card", "#interests + .card", "#certificates + .card", "#references + .card";
+
+@each $section in $cv-plain-sections {
+  #{$section} {
+    .card-title + div {
+      padding-left: 0;
+    }
+
+    .list-group {
+      padding-left: 0;
+    }
+
+    .list-group-item {
+      list-style-position: inside;
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    strong {
+      color: var(--color-accent);
+      font-family: var(--font-serif);
+      font-weight: 700;
+    }
+
+    i {
+      color: var(--color-accent);
+    }
+  }
+}

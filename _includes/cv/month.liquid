@@ -1,0 +1,16 @@
+{%- comment -%}
+  Formats a cv.yml date ("2025-09" or "2024") for the CV page. The page shows
+  years only: it is for skimming, and the PDF carries the months. Set
+  cv_show_month to true to print "Sep. 2025" as the PDF does.
+  Usage: {% capture d %}{% include cv/month.liquid date=start_date %}{% endcapture %}
+{%- endcomment -%}
+{%- assign cv_show_month = false -%}
+{%- assign cv_date_parts = include.date | append: '' | split: '-' -%}
+{%- if cv_show_month and cv_date_parts.size > 1 -%}
+  {%- assign cv_month_names = 'Jan.,Feb.,Mar.,Apr.,May,Jun.,Jul.,Aug.,Sep.,Oct.,Nov.,Dec.' | split: ',' -%}
+  {%- assign cv_month_index = cv_date_parts[1] | plus: 0 | minus: 1 -%}
+  {{- cv_month_names[cv_month_index] }}
+  {{ cv_date_parts[0] -}}
+{%- else -%}
+  {{- cv_date_parts[0] -}}
+{%- endif -%}

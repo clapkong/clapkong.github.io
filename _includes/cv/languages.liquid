@@ -1,0 +1,24 @@
+{% comment %}
+  Site copy of al_folio_cv's templates/cv/languages.liquid. Changed: the same
+  two-column list as the Contact card (.cv-kv): name on the left, level on the right.
+{% endcomment %}
+{% comment %}
+  Unified languages entry renderer for both formats
+  - RenderCV uses: name, summary
+  - JSONResume uses: language, fluency
+{% endcomment %}
+
+<div class="cv-kv">
+  {% for entry in entries %}
+    {% capture lang_name %}
+      {% if entry.name %}{{ entry.name }}{% elsif entry.language %}{{ entry.language }}{% endif %}
+    {% endcapture %}
+    {% capture fluency %}
+      {% if entry.summary %}{{ entry.summary }}{% elsif entry.fluency %}{{ entry.fluency }}{% endif %}
+    {% endcapture %}
+    <div class="cv-kv-row">
+      <div class="cv-kv-k">{{ lang_name | strip }}</div>
+      <div class="cv-kv-v">{{ fluency | strip }}</div>
+    </div>
+  {% endfor %}
+</div>

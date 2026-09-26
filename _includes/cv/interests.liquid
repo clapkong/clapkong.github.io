@@ -1,0 +1,21 @@
+{% comment %}
+  Site copy of al_folio_cv's templates/cv/interests.liquid. Changed: keywords only,
+  as one line of text; the entry name and icon are not shown. `keywords` may be a
+  list or a comma-separated string. Separators are drawn in CSS (.cv-interests).
+{% endcomment %}
+{% comment %}
+  Unified interests entry renderer for both formats
+{% endcomment %}
+
+<div class="card-text font-weight-light">
+  {% for entry in entries %}
+    {% if entry.keywords %}
+      {% assign keywords = entry.keywords | join: ',' | split: ',' %}
+      <ul class="cv-interests">
+        {% for keyword in keywords %}
+          <li>{{ keyword | strip }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endfor %}
+</div>
