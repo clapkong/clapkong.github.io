@@ -1,0 +1,32 @@
+/* Italic label + rule (DESIGN.md §3). The look lives in the mixin so the about
+   page's partial (.section-label) and the CV's gem headings share one source;
+   only size and rule colour differ. Spacing stays with each caller. */
+
+@mixin section-label($size: 16px, $rule: var(--color-border)) {
+  align-items: center;
+  color: var(--color-text);
+  display: flex;
+  font-family: var(--font-serif);
+  font-size: $size;
+  font-style: italic;
+  font-weight: var(--weight-regular);
+  gap: 14px;
+  letter-spacing: normal;
+  line-height: 1.3;
+
+  &::after {
+    background: $rule;
+    content: "";
+    flex: 1;
+    height: 1px;
+  }
+}
+
+.section-label {
+  @include section-label;
+  margin: 0 0 18px;
+
+  span {
+    flex-shrink: 0;
+  }
+}

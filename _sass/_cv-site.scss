@@ -1,3 +1,5 @@
+@use "section-label" as *;
+
 /*******************************************************************************
  * CV page: vertical timeline over the al_folio_cv markup (DESIGN.md §9.6).
  *
@@ -399,9 +401,8 @@ $list-badge: $date-column * $list-badge-scale;
       }
 
       /* Badge in a frame of two rules 10px wider on each side, centred between
-         the card edge and the title (hence -8px: half the card's 16px padding). */
+         the page edge and the title. */
       .table-cv {
-        left: -8px;
         margin: 0 auto;
         position: relative;
         top: -3px; /* a little closer to the title's first line */
@@ -512,7 +513,42 @@ $list-badge: $date-column * $list-badge-scale;
   }
 }
 
-/* Contact and Languages: name in the date column's place (pink serif, right
+/* Sections as one document (previous site): no white cards, and each heading
+   an italic label with a rule running to the right edge. The cards keep their
+   top and bottom padding (the gap between sections) but lose the sides, so
+   everything lines up with the page title. */
+.cv .card {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+@layer components {
+  .cv .card.p-3 {
+    padding-left: 0 !important; /* .p-3 is !important in the gem's Tailwind layer */
+    padding-right: 0 !important;
+  }
+}
+
+.cv .card > h3.card-title {
+  @include section-label(22px, var(--color-border-hover));
+  font-weight: var(--weight-regular) !important; /* .font-weight-medium */
+}
+
+/* TOC jumps. render.liquid puts an <a class="anchor" id="experience"> before each
+   card and the TOC script gives the heading the same id, so a link lands on the
+   anchor, which the gem lifts 50px. The TOC script scrolls to the anchor's
+   offsetTop (scroll-margin is ignored), so the anchor is moved down to the
+   heading instead: 32px is the card's top margin plus padding. Every heading
+   then lands where Contact and Summary (no anchor) do. A link opened directly
+   (/cv/#education) uses the browser's own jump, which does read scroll-margin:
+   66px is what the headings already carry, clearing the fixed navbar. */
+.cv a.anchor {
+  scroll-margin-top: 66px;
+  top: 32px;
+}
+
+/* Contact and Languages: name in the date column's place (pink serif, left
    aligned), value where every other section's text starts. */
 .cv-kv-row {
   align-items: baseline;
@@ -530,7 +566,7 @@ $list-badge: $date-column * $list-badge-scale;
   font-size: 14px;
   font-weight: 700;
   line-height: 1.4;
-  text-align: right;
+  text-align: left;
 }
 
 .cv-kv-v {

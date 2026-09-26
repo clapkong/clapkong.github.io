@@ -1,7 +1,7 @@
 {% comment %}
   Site copy of al_folio_cv's templates/cv/render.liquid. Changed: the Contact
   card is a two-column list (.cv-kv, no Professional Title row) with
-  rows for email, GitHub and LinkedIn, and a Leadership section
+  rows for email and LinkedIn (GitHub left to the footer), and a Leadership section
   drawn with the experience template (entries take the same keys). The address comes from
   `_data/contact.yml` (gitignored, AGENTS.md failure mode 6), never `cv.email`,
   and is split like the footer's so no built page carries it whole.
@@ -89,16 +89,6 @@
                         a.textContent = a.getAttribute('data-eu') + '@' + a.getAttribute('data-ed');
                       });
                     </script>
-                  </div>
-                </div>
-              {% endif %}
-              {% if site.data.socials.github_username %}
-                <div class="cv-kv-row">
-                  <div class="cv-kv-k">GitHub</div>
-                  <div class="cv-kv-v">
-                    <a href="https://github.com/{{ site.data.socials.github_username }}" target="_blank" rel="noopener"
-                      >github.com/{{ site.data.socials.github_username -}}
-                    </a>
                   </div>
                 </div>
               {% endif %}
